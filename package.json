@@ -1,0 +1,26 @@
+{
+    "name": "@nui/asset-compute-client",
+    "version": "0.0.1",
+    "description": "Asset Compute Client",
+    "main": "index.js",
+    "publishConfig": {
+        "registry": "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-nui-release-local"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://git.corp.adobe.com/nui/asset-compute-client.git"
+    },
+    "dependencies": {
+        "@adobe/jwt-auth": "^0.3.0",
+        "@nui/adobe-io-events-client": "^1.0.4",
+        "node-fetch": "^2.6.0",
+        "uuid": "^3.3.3"
+    },
+    "devDependencies": {
+        "@nui/eslint-config": "^1.0.4"
+    },
+    "scripts": {
+        "pretest": "eslint ./",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    }
+}
