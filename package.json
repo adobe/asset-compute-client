@@ -17,10 +17,13 @@
         "uuid": "^3.3.3"
     },
     "devDependencies": {
-        "@nui/eslint-config": "^1.0.4"
+        "@nui/eslint-config": "^1.0.4",
+        "mocha": "^7.1.0",
+        "mock-require": "^3.0.3",
+        "nyc": "^15.0.0"
     },
     "scripts": {
-        "pretest": "eslint ./",
-        "test": "echo \"No tests specified yet\" && exit 0"
+        "test": "nyc --reporter=html --reporter=text mocha test",
+        "posttest": "eslint ./"
     }
 }
