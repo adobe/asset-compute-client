@@ -72,9 +72,9 @@ describe( 'client.js tests', () => {
 			technicalAccount: {
 				id: 'id',
 				org:'org',
-				 clientId:'clientId',
-				  clientSecret:'clientSecret',
-				  privateKey: 'privateKey'
+				clientId:'clientId',
+				clientSecret:'clientSecret',
+				privateKey: 'privateKey'
 			}
 		}
 		try {
