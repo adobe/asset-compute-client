@@ -11,6 +11,7 @@ jspm_packages
 .webpack
 
 .nyc_output
+coverage/
 
 help.txt
 help.html

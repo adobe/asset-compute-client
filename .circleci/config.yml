@@ -61,7 +61,6 @@ commands:
         curl --fail -s -u${ARTIFACTORY_USER}:${ARTIFACTORY_TOKEN} https://artifactory.corp.adobe.com/artifactory/api/npm/npm-nui-release-local/auth/nui >> ~/.npmrc
         # this was added only for core repo
         curl --fail -s -u${ARTIFACTORY_USER}:${ARTIFACTORY_TOKEN} https://artifactory.corp.adobe.com/artifactory/api/npm/npm-aem-desktop-release-local/auth/aem-desktop >> ~/.npmrc
-
 jobs:
   build_runtime:
     working_directory: ~/repo
@@ -410,8 +409,6 @@ jobs:
               npm install
               npm test
               echo "Integration test running against $NUI_URL"
-
-
   release:
     docker:
       - image: circleci/node:12.16.1
@@ -560,7 +557,6 @@ jobs:
             git branch
             #comparing ~/validate/repo/.circleci/config.yml to ~/validate/circleci/config.yml
             cmp -s ~/validate/repo/.circleci/config.yml ~/validate/circleci/config.yml || { echo 'circleci/config.yml not in sync'; exit 1; }
-
 # validate_config job currently not used
 workflows:
     version: 2
