@@ -61,7 +61,6 @@ commands:
         curl --fail -s -u${ARTIFACTORY_USER}:${ARTIFACTORY_TOKEN} https://artifactory.corp.adobe.com/artifactory/api/npm/npm-nui-release-local/auth/nui >> ~/.npmrc
         # this was added only for core repo
         curl --fail -s -u${ARTIFACTORY_USER}:${ARTIFACTORY_TOKEN} https://artifactory.corp.adobe.com/artifactory/api/npm/npm-aem-desktop-release-local/auth/aem-desktop >> ~/.npmrc
-
 jobs:
   build_runtime:
     working_directory: ~/repo
@@ -410,8 +409,6 @@ jobs:
               npm install
               npm test
               echo "Integration test running against $NUI_URL"
-
-
   release:
     docker:
       - image: circleci/node:12.16.1
@@ -425,6 +422,10 @@ jobs:
             echo "Getting ready to release!!"
             currentVersion="$(git describe --tags)";
             cd ~
+            # install @nui/cli and nvm, required in for each run
+            # allow circleci-user to make global npm installations
+            sudo chown -R circleci /usr/local/ && chmod -R u+x+w /usr/local/
+            npm install -g @nui/cli
             git clone git@git.corp.adobe.com:nui/circleci.git
             cd circleci
             git pull
@@ -444,8 +445,13 @@ jobs:
             npm install --no-save conventional-changelog-eslint
             npx semantic-release --debug
             cat package.json
-            git status
             newVersion="$(git describe --tags)"
+            git config --global user.email "nuicid@adobe.com"
+            git config --global user.name "nuicid"
+            git status
+            git add package.json
+            git commit -m "no-release: [ci skip] update version in package json"
+            git push origin master
             echo "currentVersion -> $currentVersion & newVersion -> $newVersion"
             versionChanged=true
             if [ "$currentVersion" = "$newVersion" ]; then
@@ -460,8 +466,6 @@ jobs:
             if [ "$versionChanged" = "true" ]; then
               cd ~/project
               newVersion="${newVersion:1}"
-              git config --global user.email "nuicid@adobe.com"
-              git config --global user.name "nuicid"
               git stash save
               if [ -e README.md ]; then
                   readme=README.md
@@ -515,6 +519,10 @@ jobs:
             echo "VERSION_CHANGED -> $VERSION_CHANGED"
             if [ "$VERSION_CHANGED" = "true" ]; then
               cd ~
+              # install @nui/cli and nvm, required in for each run
+              # allow circleci-user to make global npm installations
+              sudo chown -R circleci /usr/local/ && chmod -R u+x+w /usr/local/
+              npm install -g @nui/cli
               git clone git@git.corp.adobe.com:nui/circleci.git
               cd circleci
               cd ~
@@ -549,7 +557,6 @@ jobs:
             git branch
             #comparing ~/validate/repo/.circleci/config.yml to ~/validate/circleci/config.yml
             cmp -s ~/validate/repo/.circleci/config.yml ~/validate/circleci/config.yml || { echo 'circleci/config.yml not in sync'; exit 1; }
-
 # validate_config job currently not used
 workflows:
     version: 2
