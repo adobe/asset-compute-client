@@ -12,8 +12,8 @@
     },
     "dependencies": {
         "@adobe/jwt-auth": "^0.3.0",
-        "@nui/adobe-io-events-client": "^1.3.0",
-        "node-fetch": "^2.6.0",
+        "@nui/adobe-io-events-client": "^3.0.0",
+        "@nui/node-fetch-retry": "^5.0.0",
         "uuid": "^3.3.3"
     },
     "devDependencies": {
