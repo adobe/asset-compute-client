@@ -22,6 +22,7 @@
 
 const mockRequire = require('mock-require');
 const assert = require('assert');
+const nock = require('nock');
 
 
 describe( 'client.js tests', () => {
@@ -34,11 +35,50 @@ describe( 'client.js tests', () => {
 				async createAccessToken() {
 					return '123456'
 				}
+			},
+			AdobeIOEvents: class AdobeIOEventsMock {},
+			AdobeIOEventEmitter: class AdobeIOEventEmitterMock {
+				on() {
+					return {
+						event: {
+							type: 'rendition_created'
+						}
+					}
+				}
 			}
 		})
 	})
 	afterEach( () => {
 		mockRequire.stopAll();
+		nock.cleanAll();
+	})
+
+	it('should create asset compute client with custom retryOptions', async function() {
+		const { createAssetComputeClient } = require('../lib/client');
+		const integration = {
+			applicationId: 72515,
+			consumerId: 105979,
+			metascopes: ['event_receiver_api', 'ent_adobeio_sdk', 'asset_compute_meta'],
+			technicalAccount: {
+				id: 'id',
+				org:'org',
+				 clientId:'clientId',
+				  clientSecret:'clientSecret',
+				  privateKey: 'privateKey'
+			},
+			imsEndpoint: 'https://ims-na1-stage.adobelogin.com'
+		}
+		const options = {
+			retryOptions: {
+				retryMaxDuration: 2000
+			}
+		}
+		nock('https://asset-compute.adobe.io')
+			.post('/register')
+			.reply(200, {})
+
+		const assetComputeClient = await createAssetComputeClient(integration, options);
+		assert.equal(assetComputeClient.assetCompute.retryOptions.retryMaxDuration, 2000);
 	})
 
 	it('should create asset compute client with ims endpoint in integration', async function() {
