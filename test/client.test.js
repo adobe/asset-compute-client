@@ -24,7 +24,6 @@ const mockRequire = require('mock-require');
 const assert = require('assert');
 const nock = require('nock');
 
-
 describe( 'client.js tests', () => {
 	beforeEach( () => {
 		mockRequire("@nui/adobe-io-events-client", {
