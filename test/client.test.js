@@ -52,7 +52,6 @@ describe( 'client.js tests', () => {
 		mockRequire.stopAll();
 		nock.cleanAll();
 	})
-
 	it('should create asset compute client with custom retryOptions', async function() {
 		const { createAssetComputeClient } = require('../lib/client');
 		const integration = {
