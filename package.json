@@ -1,6 +1,6 @@
 {
     "name": "@nui/asset-compute-client",
-    "version": "2.0.0",
+    "version": "3.0.0",
     "description": "Asset Compute Client",
     "main": "index.js",
     "publishConfig": {
