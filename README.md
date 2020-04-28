@@ -18,7 +18,7 @@ Example code:
 
 ```javascript
     const yaml = require("js-yaml");
-    const { createAssetComputeClient } = require("@nui/asset-compute-client");
+    const { createAssetComputeClient } = require("@adobe/asset-compute-client");
 
     const integration = yaml.safeLoad(await fs.readFile("integration.yaml", "utf-8"));
     const assetCompute = await createAssetComputeClient(integration);
@@ -40,6 +40,10 @@ Example code:
         // failed to process
     }
 ```
+
+### @adobe/node-fetch-retry
+Fetch retry options are documented [here](https://github.com/adobe/node-fetch-retry#optional-custom-parameters).
+
 
 ### Contributing
 Contributions are welcomed! Read the [Contributing Guide](./.github/CONTRIBUTING.md) for more information.

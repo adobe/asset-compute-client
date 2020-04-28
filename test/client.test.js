@@ -54,10 +54,10 @@ describe( 'client.js tests', () => {
 			metascopes: ['event_receiver_api', 'ent_adobeio_sdk', 'asset_compute_meta'],
 			technicalAccount: {
 				id: 'id',
-				org:'org',
-				 clientId:'clientId',
-				  clientSecret:'clientSecret',
-				  privateKey: 'privateKey'
+				org: 'org',
+				clientId: 'clientId',
+				clientSecret: 'clientSecret',
+				privateKey: 'privateKey'
 			},
 			imsEndpoint: 'https://ims-na1-stage.adobelogin.com'
 		}
@@ -82,16 +82,16 @@ describe( 'client.js tests', () => {
 			metascopes: ['event_receiver_api', 'ent_adobeio_sdk', 'asset_compute_meta'],
 			technicalAccount: {
 				id: 'id',
-				org:'org',
-				 clientId:'clientId',
-				  clientSecret:'clientSecret',
-				  privateKey: 'privateKey'
+				org: 'org',
+				clientId: 'clientId',
+				clientSecret: 'clientSecret',
+				privateKey: 'privateKey'
 			},
 			imsEndpoint: 'https://ims-na1-stage.adobelogin.com'
 		}
 		try {
 			await createAssetComputeClient(integration);
-		} catch(e) {
+		} catch (e) { /* eslint-disable-line no-unused-vars */
 			// ignore errors that happen after initialization of AdobeAuth
 		}
 	})
@@ -112,9 +112,8 @@ describe( 'client.js tests', () => {
 		}
 		try {
 			await createAssetComputeClient(integration, { imsEndpoint: 'https://ims-na1-stage.adobelogin.com'});
-		} catch(e) {
+		} catch (e) { /* eslint-disable-line no-unused-vars */
 			// ignore errors that happen after initialization of AdobeAuth
 		}
 	})
 })
-

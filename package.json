@@ -1,28 +1,33 @@
 {
     "name": "@nui/asset-compute-client",
+    "description": "Adobe Asset Compute Client",
     "version": "4.0.0",
-    "description": "Asset Compute Client",
+    "license": "Apache-2.0",
     "main": "index.js",
-    "publishConfig": {
-        "registry": "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-nui-release-local"
+    "author": {
+        "name": "Adobe Inc."
     },
-    "repository": {
-        "type": "git",
-        "url": "https://git.corp.adobe.com/nui/asset-compute-client.git"
-    },
+    "repository": "nui/asset-compute-client",
     "dependencies": {
         "@adobe/jwt-auth": "^0.3.0",
         "@nui/adobe-io-events-client": "^3.0.0",
-        "@nui/node-fetch-retry": "^5.0.0",
+        "@adobe/node-fetch-retry": "^1.0.0",
         "uuid": "^3.3.3"
     },
     "devDependencies": {
-        "@nui/eslint-config": "^1.0.4",
+        "@nui/eslint-config": "^1.0.0",
         "mocha": "^7.1.0",
         "mock-require": "^3.0.3",
         "nock": "^12.0.3",
         "nyc": "^15.0.0"
     },
+    "keywords": [
+        "scripts",
+        "openwhisk",
+        "asset compute",
+        "client",
+        "adobe"
+    ],
     "scripts": {
         "test": "nyc --reporter=html --reporter=text mocha test",
         "posttest": "eslint ./"
