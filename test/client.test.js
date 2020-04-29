@@ -21,7 +21,7 @@ const nock = require('nock');
 
 describe( 'client.js tests', () => {
 	beforeEach( () => {
-		mockRequire("@nui/adobe-io-events-client", {
+		mockRequire("@adobe/asset-compute-events-client", {
 			AdobeAuth: class AdobeAuthMock {
 				constructor(config) {
 					assert.equal(config.adobeLoginHost, 'https://ims-na1-stage.adobelogin.com');

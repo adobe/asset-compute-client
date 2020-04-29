@@ -10,7 +10,7 @@
     "repository": "nui/asset-compute-client",
     "dependencies": {
         "@adobe/jwt-auth": "^0.3.0",
-        "@nui/adobe-io-events-client": "^3.0.0",
+        "@adobe/asset-compute-events-client": "^1.0.0",
         "@adobe/node-fetch-retry": "^1.0.0",
         "uuid": "^3.3.3"
     },
