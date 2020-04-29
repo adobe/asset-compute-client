@@ -1,5 +1,5 @@
 {
-    "name": "@nui/asset-compute-client",
+    "name": "@adobe/asset-compute-client",
     "description": "Adobe Asset Compute Client",
     "version": "4.0.0",
     "license": "Apache-2.0",
@@ -7,7 +7,7 @@
     "author": {
         "name": "Adobe Inc."
     },
-    "repository": "nui/asset-compute-client",
+    "repository": "adobe/asset-compute-client",
     "dependencies": {
         "@adobe/jwt-auth": "^0.3.1",
         "@adobe/asset-compute-events-client": "^1.0.0",
