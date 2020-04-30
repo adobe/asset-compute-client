@@ -40,12 +40,13 @@ describe( 'client.js tests', () => {
 					};
 				}
 			}
-		})
-	})
+		});
+    });
+    
 	afterEach( () => {
 		mockRequire.stopAll();
 		nock.cleanAll();
-	})
+	});
 	it('should create asset compute client with custom retryOptions', async function() {
 		const { createAssetComputeClient } = require('../lib/client');
 		const integration = {
@@ -72,7 +73,7 @@ describe( 'client.js tests', () => {
 
 		const assetComputeClient = await createAssetComputeClient(integration, options);
 		assert.equal(assetComputeClient.assetCompute.retryOptions.retryMaxDuration, 2000);
-	})
+	});
 
 	it('should create asset compute client with ims endpoint in integration', async function() {
 		const { createAssetComputeClient } = require('../lib/client');
@@ -94,7 +95,7 @@ describe( 'client.js tests', () => {
 		} catch (e) { /* eslint-disable-line no-unused-vars */
 			// ignore errors that happen after initialization of AdobeAuth
 		}
-	})
+	});
 
 	it('should create asset compute client with ims endpoint in options', async function() {
 		const { createAssetComputeClient } = require('../lib/client');
@@ -115,5 +116,5 @@ describe( 'client.js tests', () => {
 		} catch (e) { /* eslint-disable-line no-unused-vars */
 			// ignore errors that happen after initialization of AdobeAuth
 		}
-	})
-})
+	});
+});
