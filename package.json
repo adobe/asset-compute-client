@@ -7,7 +7,7 @@
     "author": {
         "name": "Adobe Inc."
     },
-    "repository": "nui/asset-compute-client",
+    "repository": "adobe/asset-compute-client",
     "dependencies": {
         "@adobe/jwt-auth": "^0.3.1",
         "@adobe/asset-compute-events-client": "^1.0.0",
