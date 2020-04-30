@@ -21,13 +21,13 @@ const nock = require('nock');
 
 describe( 'client.js tests', () => {
 	beforeEach( () => {
-		mockRequire("@nui/adobe-io-events-client", {
+		mockRequire("@adobe/asset-compute-events-client", {
 			AdobeAuth: class AdobeAuthMock {
 				constructor(config) {
 					assert.equal(config.adobeLoginHost, 'https://ims-na1-stage.adobelogin.com');
 				}
 				async createAccessToken() {
-					return '123456'
+					return '123456';
 				}
 			},
 			AdobeIOEvents: class AdobeIOEventsMock {},
@@ -37,15 +37,16 @@ describe( 'client.js tests', () => {
 						event: {
 							type: 'rendition_created'
 						}
-					}
+					};
 				}
 			}
-		})
-	})
+		});
+    });
+    
 	afterEach( () => {
 		mockRequire.stopAll();
 		nock.cleanAll();
-	})
+	});
 	it('should create asset compute client with custom retryOptions', async function() {
 		const { createAssetComputeClient } = require('../lib/client');
 		const integration = {
@@ -60,19 +61,19 @@ describe( 'client.js tests', () => {
 				privateKey: 'privateKey'
 			},
 			imsEndpoint: 'https://ims-na1-stage.adobelogin.com'
-		}
+		};
 		const options = {
 			retryOptions: {
 				retryMaxDuration: 2000
 			}
-		}
+		};
 		nock('https://asset-compute.adobe.io')
 			.post('/register')
 			.reply(200, {})
 
 		const assetComputeClient = await createAssetComputeClient(integration, options);
 		assert.equal(assetComputeClient.assetCompute.retryOptions.retryMaxDuration, 2000);
-	})
+	});
 
 	it('should create asset compute client with ims endpoint in integration', async function() {
 		const { createAssetComputeClient } = require('../lib/client');
@@ -88,13 +89,13 @@ describe( 'client.js tests', () => {
 				privateKey: 'privateKey'
 			},
 			imsEndpoint: 'https://ims-na1-stage.adobelogin.com'
-		}
+		};
 		try {
 			await createAssetComputeClient(integration);
 		} catch (e) { /* eslint-disable-line no-unused-vars */
 			// ignore errors that happen after initialization of AdobeAuth
 		}
-	})
+	});
 
 	it('should create asset compute client with ims endpoint in options', async function() {
 		const { createAssetComputeClient } = require('../lib/client');
@@ -109,11 +110,11 @@ describe( 'client.js tests', () => {
 				clientSecret:'clientSecret',
 				privateKey: 'privateKey'
 			}
-		}
+		};
 		try {
 			await createAssetComputeClient(integration, { imsEndpoint: 'https://ims-na1-stage.adobelogin.com'});
 		} catch (e) { /* eslint-disable-line no-unused-vars */
 			// ignore errors that happen after initialization of AdobeAuth
 		}
-	})
-})
+	});
+});
