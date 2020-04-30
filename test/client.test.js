@@ -27,7 +27,7 @@ describe( 'client.js tests', () => {
 					assert.equal(config.adobeLoginHost, 'https://ims-na1-stage.adobelogin.com');
 				}
 				async createAccessToken() {
-					return '123456'
+					return '123456';
 				}
 			},
 			AdobeIOEvents: class AdobeIOEventsMock {},
@@ -37,7 +37,7 @@ describe( 'client.js tests', () => {
 						event: {
 							type: 'rendition_created'
 						}
-					}
+					};
 				}
 			}
 		})
@@ -60,12 +60,12 @@ describe( 'client.js tests', () => {
 				privateKey: 'privateKey'
 			},
 			imsEndpoint: 'https://ims-na1-stage.adobelogin.com'
-		}
+		};
 		const options = {
 			retryOptions: {
 				retryMaxDuration: 2000
 			}
-		}
+		};
 		nock('https://asset-compute.adobe.io')
 			.post('/register')
 			.reply(200, {})
@@ -88,7 +88,7 @@ describe( 'client.js tests', () => {
 				privateKey: 'privateKey'
 			},
 			imsEndpoint: 'https://ims-na1-stage.adobelogin.com'
-		}
+		};
 		try {
 			await createAssetComputeClient(integration);
 		} catch (e) { /* eslint-disable-line no-unused-vars */
@@ -109,7 +109,7 @@ describe( 'client.js tests', () => {
 				clientSecret:'clientSecret',
 				privateKey: 'privateKey'
 			}
-		}
+		};
 		try {
 			await createAssetComputeClient(integration, { imsEndpoint: 'https://ims-na1-stage.adobelogin.com'});
 		} catch (e) { /* eslint-disable-line no-unused-vars */
