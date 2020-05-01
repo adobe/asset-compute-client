@@ -1,5 +1,7 @@
 # Asset Compute Client
 
+[![Version](https://img.shields.io/npm/v/@adobe/asset-compute-client.svg)](https://npmjs.org/package/@adobe/asset-compute-client)
+
 The Asset Compute Client is separated in 3 parts:
 
 - [AssetCompute](lib/assetcompute.js) - A light-weight wrapper around the AssetCompute API.
