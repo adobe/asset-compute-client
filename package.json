@@ -1,25 +1,25 @@
 {
-    "name": "@nui/asset-compute-client",
+    "name": "@adobe/asset-compute-client",
     "description": "Adobe Asset Compute Client",
-    "version": "4.0.0",
+    "version": "1.0.0",
     "license": "Apache-2.0",
     "main": "index.js",
     "author": {
         "name": "Adobe Inc."
     },
-    "repository": "nui/asset-compute-client",
+    "repository": "adobe/asset-compute-client",
     "dependencies": {
-        "@adobe/jwt-auth": "^0.3.0",
+        "@adobe/jwt-auth": "^0.3.1",
         "@adobe/asset-compute-events-client": "^1.0.0",
-        "@adobe/node-fetch-retry": "^1.0.0",
+        "@adobe/node-fetch-retry": "^1.0.1",
         "uuid": "^3.3.3"
     },
     "devDependencies": {
-        "@nui/eslint-config": "^1.0.0",
-        "mocha": "^7.1.0",
+        "@adobe/eslint-config-asset-compute": "^1.0.0",
+        "mocha": "^7.1.2",
         "mock-require": "^3.0.3",
         "nock": "^12.0.3",
-        "nyc": "^15.0.0"
+        "nyc": "^15.0.1"
     },
     "keywords": [
         "scripts",
