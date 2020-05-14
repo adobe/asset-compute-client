@@ -30,8 +30,6 @@
     ],
     "scripts": {
         "test": "nyc --reporter=html --reporter=text mocha test",
-        "posttest": "eslint ./",
-        "dep-license-details": "license-checker -unknown --out dependencies-licenses.log",
-        "dep-license-list": "license-checker --summary -unknown"
+        "posttest": "eslint ./"
     }
 }
