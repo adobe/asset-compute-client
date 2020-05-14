@@ -26,7 +26,7 @@ describe( 'assetcompute.js tests', () => {
 	});
 
 	it('should call asset compute /register successfully', async function() {
-		const { AssetCompute } = require('../lib/assetCompute');
+		const { AssetCompute } = require('../lib/assetcompute');
 		const options = {
 			accessToken: 'accessToken',
 			org: 'org',
@@ -50,7 +50,7 @@ describe( 'assetcompute.js tests', () => {
 	});
 
 	it('should call asset compute /unregister successfully', async function() {
-		const { AssetCompute } = require('../lib/assetCompute');
+		const { AssetCompute } = require('../lib/assetcompute');
 		const options = {
 			accessToken: 'accessToken',
 			org: 'org',
@@ -80,7 +80,7 @@ describe( 'assetcompute.js tests', () => {
 	});
 
 	it('should fail call asset compute /unregister before calling /register', async function() {
-		const { AssetCompute } = require('../lib/assetCompute');
+		const { AssetCompute } = require('../lib/assetcompute');
 		const options = {
 			accessToken: 'accessToken',
 			org: 'org',
