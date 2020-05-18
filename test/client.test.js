@@ -153,7 +153,7 @@ describe( 'client.js tests', () => {
 
         // register integration
         await assetComputeClient.register();
-        assert.ok(assetComputeClient.registered);
+        assert.ok(assetComputeClient._registered);
 
         // process renditions
         const response = await assetComputeClient.process({
@@ -170,7 +170,7 @@ describe( 'client.js tests', () => {
         // unregister integration
         const { requestId } = await assetComputeClient.unregister();
         assert.strictEqual(requestId, '4321');
-        assert.ok(!assetComputeClient.registered);
+        assert.ok(!assetComputeClient._registered);
     });
 
     it('should implictely call /register before calling /process', async function() {
@@ -201,7 +201,7 @@ describe( 'client.js tests', () => {
                 fmt: 'jpg'
             }
         ]);
-        assert.ok(assetComputeClient.registered);
+        assert.ok(assetComputeClient._registered);
         assert.strictEqual(response.requestId, '3214');
     });
 
