@@ -24,7 +24,6 @@ Example code:
 
     const integration = yaml.safeLoad(await fs.readFile("integration.yaml", "utf-8"));
     const assetCompute = new AssetComputeClient(integration);
-    await assetCompute.register(); // register journal
     const { activationId } = await assetCompute.process(
         "https://source-url", [
             {

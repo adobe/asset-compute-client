@@ -173,24 +173,36 @@ describe( 'client.js tests', () => {
         assert.ok(!assetComputeClient.registered);
     });
 
-    it('should fail processing without calling /register first', async function() {
+    it('should implictely call /register before calling /process', async function() {
         const { AssetComputeClient } = require('../lib/client');
 
+        nock('https://asset-compute.adobe.io')
+            .post('/register')
+            .reply(200,{
+                'ok': true,
+                'journal': 'https://api.adobe.io/events/organizations/journal/12345',
+                'requestId': '1234'
+            })
+        nock('https://asset-compute.adobe.io')
+            .post('/process')
+            .reply(200,{
+                'ok': true,
+                'requestId': '3214'
+            })
+
         const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
-        try {
-            await assetComputeClient.process({
-                url: 'https://example.com/dog.jpg'
-            },
-            [
-                {
-                    name: 'rendition.jpg',
-                    fmt: 'jpg'
-                }
-            ]);
-            assert.fail('Should have failed');
-        } catch (e) {
-            assert.ok(e.message.includes('Must register journal before calling /process'));
-        }
+       // process renditions
+       const response = await assetComputeClient.process({
+            url: 'https://example.com/dog.jpg'
+        },
+        [
+            {
+                name: 'rendition.jpg',
+                fmt: 'jpg'
+            }
+        ]);
+        assert.ok(assetComputeClient.registered);
+        assert.strictEqual(response.requestId, '3214');
     });
 
     it('should fail calling /unregister without calling /register first', async function() {
