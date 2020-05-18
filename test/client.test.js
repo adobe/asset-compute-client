@@ -210,10 +210,10 @@ describe( 'client.js tests', () => {
 
         const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
         nock('https://asset-compute.adobe.io')
-			.post('/unregister')
-			.reply(404,{
-				'ok': true
-			})
+            .post('/unregister')
+            .reply(404,{
+                'ok': true
+            })
         try {
             await assetComputeClient.unregister();
         } catch (e) {
