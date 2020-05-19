@@ -14,10 +14,11 @@ governing permissions and limitations under the License.
 
 const { AssetCompute } = require("./lib/assetcompute");
 const { AssetComputeEventEmitter } = require("./lib/eventemitter");
-const { createAssetComputeClient } = require("./lib/client");
+const { createAssetComputeClient, AssetComputeClient } = require("./lib/client");
 
 module.exports = {
     AssetCompute,
     AssetComputeEventEmitter,
-    createAssetComputeClient
+    createAssetComputeClient,
+    AssetComputeClient
 }
