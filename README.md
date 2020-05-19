@@ -23,7 +23,7 @@ Example code:
     const { createAssetComputeClient } = require("@adobe/asset-compute-client");
 
     const integration = yaml.safeLoad(await fs.readFile("integration.yaml", "utf-8"));
-    const assetCompute = await createAssetComputeClient(integration);
+    const assetCompute = new AssetComputeClient(integration);
     const { activationId } = await assetCompute.process(
         "https://source-url", [
             {
