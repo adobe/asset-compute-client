@@ -19,13 +19,7 @@
           "subject": "BREAKING-RELEASE:*",
           "release": "major"
         }
-        ],
-      "parserOpts": {
-        "noteKeywords": [
-          "BREAKING CHANGE",
-          "BREAKING CHANGES"
         ]
-      }
       }],
       ["@semantic-release/release-notes-generator", {
         "preset": "eslint"
