@@ -79,7 +79,8 @@ describe( 'assetcompute.js tests', () => {
 		assert.strictEqual(response.requestId, requestId);
 	});
 
-	it('should fail call asset compute /unregister before calling /register', async function() {
+	
+it('should fail call asset compute /unregister before calling /register', async function() {
 		const { AssetCompute } = require('../lib/assetcompute');
 		const options = {
 			accessToken: 'accessToken',
@@ -103,4 +104,38 @@ describe( 'assetcompute.js tests', () => {
 		}
 	});
 
+
+	it('should fail calling /process', async function() {
+		const { AssetCompute } = require('../lib/assetcompute');
+		const options = {
+			accessToken: 'accessToken',
+			org: 'org',
+			apiKey: 'apiKey'
+
+		}
+		const requestId = '1234567890';
+		nock('https://asset-compute.adobe.io')
+			.post('/process')
+			.reply(401,{
+				'ok': false,
+				'requestId': requestId,
+				'message':'unauthorized'
+			})
+
+		const assetCompute = new AssetCompute(options);
+		try {
+			await assetCompute.process({
+				url: 'https://example.com/dog.jpg'
+			},
+			[
+				{
+					name: 'rendition.jpg',
+					fmt: 'jpg'
+				}
+			]);
+			assert.fail('Should have failed')
+		} catch (e) {
+			assert.ok(e.message.includes('401'));
+		}
+	});
 })

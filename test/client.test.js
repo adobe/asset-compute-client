@@ -57,7 +57,7 @@ describe( 'client.js tests', () => {
             }
         });
     });
-    
+
     afterEach( () => {
         delete process.env.REGISTER_WAIT_TIME_MSEC;
         mockRequire.stopAll();
@@ -108,7 +108,16 @@ describe( 'client.js tests', () => {
         }
     });
 
-    it('should create asset compute client and call /unregister', async function() {
+    it('should fail to create asset compute client with missing integration', async function() {
+        const { AssetComputeClient } = require('../lib/client');
+        try {
+            new AssetComputeClient();
+        } catch (e) { 
+            assert.ok(e.message.includes('Asset Compute integration'));
+        }
+    });
+
+    it('should call /register and then /unregister', async function() {
         const { createAssetComputeClient } = require('../lib/client');
 
         nock('https://asset-compute.adobe.io')
@@ -129,7 +138,7 @@ describe( 'client.js tests', () => {
         assert.strictEqual(requestId, '4321');
     });
 
-    it('should create asset compute client without calling createAssetComputeClient', async function() {
+    it('should call /register, /process, then /unregister', async function() {
         const { AssetComputeClient } = require('../lib/client');
 
         nock('https://asset-compute.adobe.io')
@@ -156,6 +165,7 @@ describe( 'client.js tests', () => {
         // register integration
         await assetComputeClient.register();
         assert.ok(assetComputeClient._registered);
+        assert.ok(!assetComputeClient.eventEmitter);
 
         // process renditions
         const response = await assetComputeClient.process({
@@ -168,11 +178,139 @@ describe( 'client.js tests', () => {
             }
         ]);
         assert.strictEqual(response.requestId, '3214');
-
+        assert.ok(assetComputeClient.eventEmitter);
         // unregister integration
         const { requestId } = await assetComputeClient.unregister();
         assert.strictEqual(requestId, '4321');
         assert.ok(!assetComputeClient._registered);
+    });
+
+    it('should call /register, /process, then /unregister multiple times', async function() {
+        const { AssetComputeClient } = require('../lib/client');
+
+        nock('https://asset-compute.adobe.io')
+            .post('/register')
+            .reply(200,{
+                'ok': true,
+                'journal': 'https://api.adobe.io/events/organizations/journal/12345',
+                'requestId': '1234'
+            })
+        nock('https://asset-compute.adobe.io')
+            .post('/process')
+            .reply(200,{
+                'ok': true,
+                'requestId': '3214'
+            })
+        nock('https://asset-compute.adobe.io')
+            .post('/register')
+            .reply(200,{
+                'ok': true,
+                'journal': 'https://api.adobe.io/events/organizations/journal/12345',
+                'requestId': '1234'
+            })
+        nock('https://asset-compute.adobe.io')
+            .post('/unregister')
+            .reply(200,{
+                'ok': true,
+                'requestId': '4321'
+            })
+        nock('https://asset-compute.adobe.io')
+            .post('/register')
+            .reply(200,{
+                'ok': true,
+                'journal': 'https://api.adobe.io/events/organizations/journal/12345',
+                'requestId': '1234'
+            })
+        nock('https://asset-compute.adobe.io')
+            .post('/unregister')
+            .reply(200,{
+                'ok': true,
+                'requestId': '4321'
+            })
+        const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
+
+        // register integration
+        await assetComputeClient.register();
+        assert.ok(assetComputeClient._registered);
+        assert.ok(!assetComputeClient.eventEmitter); // no event emitter until /process call
+
+        // process renditions
+        const response = await assetComputeClient.process({
+            url: 'https://example.com/dog.jpg'
+        },
+        [
+            {
+                name: 'rendition.jpg',
+                fmt: 'jpg'
+            }
+        ]);
+        assert.strictEqual(response.requestId, '3214');
+        assert.ok(assetComputeClient.eventEmitter); // no there is an event emitter to get events
+
+        // register integration
+        await assetComputeClient.register();
+        assert.ok(assetComputeClient._registered);
+        assert.ok(!assetComputeClient.eventEmitter); // no event emitter since /register called again
+
+        // unregister integration
+        await assetComputeClient.unregister();
+        assert.ok(!assetComputeClient._registered);
+
+        // register integration again
+        await assetComputeClient.register();
+        assert.ok(assetComputeClient._registered);
+        assert.ok(!assetComputeClient.eventEmitter); // no event emitter since /register called again
+
+        // unregister integration again
+        await assetComputeClient.unregister();
+        assert.ok(!assetComputeClient._registered);
+        assert.ok(!assetComputeClient.eventEmitter);
+    });
+
+    it('calling /register twice has no effect', async function() {
+        const { AssetComputeClient } = require('../lib/client');
+
+        nock('https://asset-compute.adobe.io')
+            .post('/register')
+            .reply(200,{
+                'ok': true,
+                'journal': 'https://api.adobe.io/events/organizations/journal/12345',
+                'requestId': '1234'
+            })
+        nock('https://asset-compute.adobe.io')
+            .post('/register')
+            .reply(200,{
+                'ok': true,
+                'journal': 'https://api.adobe.io/events/organizations/journal/12345',
+                'requestId': '1234'
+            })
+        nock('https://asset-compute.adobe.io')
+            .post('/process')
+            .reply(200,{
+                'ok': true,
+                'requestId': '3214'
+            })
+        const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
+
+        // register integration
+        await assetComputeClient.register();
+        assert.ok(assetComputeClient._registered);
+
+        // register integration
+        await assetComputeClient.register();
+        assert.ok(assetComputeClient._registered);
+
+        // process renditions
+        const response = await assetComputeClient.process({
+            url: 'https://example.com/dog.jpg'
+        },
+        [
+            {
+                name: 'rendition.jpg',
+                fmt: 'jpg'
+            }
+        ]);
+        assert.strictEqual(response.requestId, '3214');
     });
 
     it('should implictely call /register before calling /process', async function() {
@@ -220,9 +358,45 @@ describe( 'client.js tests', () => {
             })
         try {
             await assetComputeClient.unregister();
+            assert.fail('Should have failed');
         } catch (e) {
             assert.ok(e.message.includes('404'));
         }
+    });
+
+    it('should call `close()` when finished with asset compute client', async function() {
+        const { AssetComputeClient } = require('../lib/client');
+
+        process.env.REGISTER_WAIT_TIME_MSEC = 200; // no need to wait between register and processing because mocks
+
+        nock('https://asset-compute.adobe.io')
+            .post('/register')
+            .reply(200,{
+                'ok': true,
+                'journal': 'https://api.adobe.io/events/organizations/journal/12345',
+                'requestId': '1234'
+            })
+        nock('https://asset-compute.adobe.io')
+            .post('/process')
+            .reply(200,{
+                'ok': true,
+                'requestId': '3214'
+            })
+
+        const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
+       // process renditions
+       const response = await assetComputeClient.process({
+            url: 'https://example.com/dog.jpg'
+        },
+        [
+            {
+                name: 'rendition.jpg',
+                fmt: 'jpg'
+            }
+        ]);
+        assert.ok(assetComputeClient._registered);
+        assert.strictEqual(response.requestId, '3214');
+        await assetComputeClient.close();
     });
 
 });
