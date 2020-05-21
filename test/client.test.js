@@ -53,6 +53,7 @@ describe( 'client.js tests', () => {
                         }
                     };
                 }
+                stop() {}
             }
         });
     });
