@@ -34,8 +34,8 @@ jobs:
       script: skip
       before_deploy: 
         - "echo 'instal semantic dependencies...'"
-        - npm install --no-save semantic-release
-        - npm install --no-save conventional-changelog-eslint
+        - npm install --no-save semantic-release@17.0.7
+        - npm install --no-save conventional-changelog-eslint@3.0.8
       deploy:
         on:
           branch: master
