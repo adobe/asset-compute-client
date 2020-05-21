@@ -58,6 +58,7 @@ describe( 'client.js tests', () => {
     });
     
     afterEach( () => {
+        delete process.env.REGISTER_WAIT_TIME_MSEC;
         mockRequire.stopAll();
         nock.cleanAll();
     });
@@ -65,7 +66,7 @@ describe( 'client.js tests', () => {
         const { createAssetComputeClient } = require('../lib/client');
         const options = {
             retryOptions: {
-                retryMaxDuration: 2000
+                retryMaxDuration: 1000
             }
         };
         nock('https://asset-compute.adobe.io')
@@ -73,7 +74,7 @@ describe( 'client.js tests', () => {
             .reply(200, {})
 
         const assetComputeClient = await createAssetComputeClient(DEFAULT_INTEGRATION, options);
-        assert.equal(assetComputeClient.assetCompute.retryOptions.retryMaxDuration, 2000);
+        assert.equal(assetComputeClient.assetCompute.retryOptions.retryMaxDuration, 1000);
     });
 
     it('should create asset compute client with ims endpoint in integration', async function() {
@@ -175,6 +176,8 @@ describe( 'client.js tests', () => {
 
     it('should implictely call /register before calling /process', async function() {
         const { AssetComputeClient } = require('../lib/client');
+
+        process.env.REGISTER_WAIT_TIME_MSEC = 200; // no need to wait between register and processing because mocks
 
         nock('https://asset-compute.adobe.io')
             .post('/register')
