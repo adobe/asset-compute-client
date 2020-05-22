@@ -2,6 +2,7 @@
 
 [![Version](https://img.shields.io/npm/v/@adobe/asset-compute-client.svg)](https://npmjs.org/package/@adobe/asset-compute-client)
 
+## Overview
 The Asset Compute Client is separated in 3 parts:
 
 - [AssetCompute](lib/assetcompute.js) - A light-weight wrapper around the AssetCompute API.
@@ -16,19 +17,69 @@ AssetComputeClient has the following capabilities:
 - Wait for a single Asset Compute process request to finish (default timeout is 60s)
 - Wait for all Asset Compute process requests to finish (default timeout is 60s)
 
-Example code:
+## Installation
 
+```
+npm i @adobe/asset-compute-client
+```
+
+## Usage
+
+### Using the Class Initialization
+After the client is set up, you must call `.register()` once before the first call to `.process()`.
+
+If the integration does not already have an I/O Events journal registered, it may take some time after calling `.register()` to be able to recieve and send I/O Events so it is recommended to add some wait time before calling `.process()`.
+
+If the integration already has an I/O Events journal registered, it is recommended to not wait before calling `.process()`.
+```javascript
+    const yaml = require("js-yaml");
+    const { AssetComputeClient } = require("@adobe/asset-compute-client");
+    const sleep = require('util').promisify(setTimeout);
+
+
+    const integration = yaml.safeLoad(await fs.readFile("integration.yaml", "utf-8"));
+    const assetCompute = new AssetComputeClient(integration);
+
+    // Call register before first call the process
+    await assetCompute.register();
+
+    // add wait time for events provider to set up
+    await sleep(30000); // 30s
+
+    const { activationId } = await assetCompute.process(
+        "https://presigned-source-url", [
+            {
+                name: "rendition.png",
+                url: "https://presigned-target-url",
+                fmt: "png",
+                wid: 200,
+                hei: 200
+            }
+        ]
+    )
+    const events = await assetCompute.waitActivation(activationId);
+    if (events[0].type === "rendition_created") {
+        // use the rendition
+    } else {
+        // failed to process
+    }
+```
+
+### Using `createAssetComputeClient()` for Initialization
+
+This function creates a new instance of `AssetComputeClient` and calls `.register()` method.
 ```javascript
     const yaml = require("js-yaml");
     const { createAssetComputeClient } = require("@adobe/asset-compute-client");
 
     const integration = yaml.safeLoad(await fs.readFile("integration.yaml", "utf-8"));
-    const assetCompute = new AssetComputeClient(integration);
+    const assetCompute = await createAssetComputeClient(integration);
+    // add wait time if needed
     const { activationId } = await assetCompute.process(
-        "https://source-url", [
+        "https://presigned-source-url", [
             {
                 name: "rendition.png",
-                url: "https://target-url",
+                url: "https://presigned-target-url",
                 fmt: "png",
                 wid: 200,
                 hei: 200
