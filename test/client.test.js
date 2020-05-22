@@ -1,14 +1,14 @@
 /*
-Copyright 2020 Adobe. All rights reserved.
-This file is licensed to you under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License. You may obtain a copy
-of the License at http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software distributed under
-the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
-OF ANY KIND, either express or implied. See the License for the specific language
-governing permissions and limitations under the License.
-*/
+ * Copyright 2020 Adobe. All rights reserved.
+ * This file is licensed to you under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License. You may obtain a copy
+ * of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+ * OF ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 
 /* eslint-env mocha */
 /* eslint mocha/no-mocha-arrows: "off" */
@@ -56,7 +56,7 @@ describe( 'client.js tests', () => {
             }
         });
     });
-    
+
     afterEach( () => {
         mockRequire.stopAll();
         nock.cleanAll();
@@ -70,7 +70,7 @@ describe( 'client.js tests', () => {
         };
         nock('https://asset-compute.adobe.io')
             .post('/register')
-            .reply(200, {})
+            .reply(200, {});
 
         const assetComputeClient = await createAssetComputeClient(DEFAULT_INTEGRATION, options);
         assert.equal(assetComputeClient.assetCompute.retryOptions.retryMaxDuration, 2000);
@@ -115,13 +115,13 @@ describe( 'client.js tests', () => {
                 'ok': true,
                 'journal': 'https://api.adobe.io/events/organizations/journal/12345',
                 'requestId': '1234'
-            })
+            });
         nock('https://asset-compute.adobe.io')
             .post('/unregister')
             .reply(200,{
                 'ok': true,
                 'requestId': '4321'
-            })
+            });
         const assetComputeClient = await createAssetComputeClient(DEFAULT_INTEGRATION);
         const { requestId } = await assetComputeClient.unregister();
         assert.strictEqual(requestId, '4321');
@@ -136,19 +136,19 @@ describe( 'client.js tests', () => {
                 'ok': true,
                 'journal': 'https://api.adobe.io/events/organizations/journal/12345',
                 'requestId': '1234'
-            })
+            });
         nock('https://asset-compute.adobe.io')
             .post('/process')
             .reply(200,{
                 'ok': true,
                 'requestId': '3214'
-            })
+            });
         nock('https://asset-compute.adobe.io')
             .post('/unregister')
             .reply(200,{
                 'ok': true,
                 'requestId': '4321'
-            })
+            });
         const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
 
         // register integration
@@ -182,17 +182,17 @@ describe( 'client.js tests', () => {
                 'ok': true,
                 'journal': 'https://api.adobe.io/events/organizations/journal/12345',
                 'requestId': '1234'
-            })
+            });
         nock('https://asset-compute.adobe.io')
             .post('/process')
             .reply(200,{
                 'ok': true,
                 'requestId': '3214'
-            })
+            });
 
         const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
-       // process renditions
-       const response = await assetComputeClient.process({
+        // process renditions
+        const response = await assetComputeClient.process({
             url: 'https://example.com/dog.jpg'
         },
         [
@@ -213,7 +213,7 @@ describe( 'client.js tests', () => {
             .post('/unregister')
             .reply(404,{
                 'ok': true
-            })
+            });
         try {
             await assetComputeClient.unregister();
         } catch (e) {

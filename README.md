@@ -1,6 +1,8 @@
 # Asset Compute Client
 
-[![Version](https://img.shields.io/npm/v/@adobe/asset-compute-client.svg)](https://npmjs.org/package/@adobe/asset-compute-client)
+[![Version](https://img.shields.io/npm/v/@adobe/<package-name>.svg)](https://npmjs.org/package/@adobe/asset-compute-client)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+[![Travis](https://travis-ci.com/adobe/<package-name>.svg?branch=master)](https://travis-ci.com/adobe/asset-compute-client)
 
 The Asset Compute Client is separated in 3 parts:
 

@@ -12,6 +12,7 @@ language: node_js
 os:
   - linux
   - osx
+  - windows
 
 node_js:
   - "10"
@@ -32,7 +33,7 @@ jobs:
       if: branch = master
       node_js: "12"
       script: skip
-      before_deploy: 
+      before_deploy:
         - "echo 'semantic release...'"
       deploy:
         on:
@@ -40,5 +41,7 @@ jobs:
           condition:  $TRAVIS_OS_NAME == linux
         provider: script
         skip_cleanup: true
-        script:
-          - npx semantic-release --debug
+        script: npx semantic-release --debug
+
+after_success:
+  - npm run report-coverage
