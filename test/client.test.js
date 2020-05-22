@@ -381,6 +381,42 @@ describe( 'client.js tests', () => {
         }
     });
 
+    it('should fail /process after calling /unregister', async function() {
+        const { AssetComputeClient } = require('../lib/client');
+        nock('https://asset-compute.adobe.io')
+            .post('/register')
+            .reply(200,{
+                'ok': true,
+                'journal': 'https://api.adobe.io/events/organizations/journal/12345',
+                'requestId': '1234'
+            })
+        nock('https://asset-compute.adobe.io')
+            .post('/unregister')
+            .reply(200,{
+                'ok': true,
+                'requestId': '4321'
+            })
+
+        const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
+        await assetComputeClient.register();
+        await assetComputeClient.unregister();
+        try {
+            await assetComputeClient.process({
+                url: 'https://example.com/dog.jpg'
+            },
+            [
+                {
+                    name: 'rendition.jpg',
+                    fmt: 'jpg'
+                }
+            ]);
+            assert.fail('Should have failed.');
+        } catch (e) {
+            assert.ok(e.message.includes('Must call register before calling /process'));
+            assert.ok(!assetComputeClient._registered);
+        }
+    });
+
     it('should call `close()` when finished with asset compute client', async function() {
         const { AssetComputeClient } = require('../lib/client');
 

@@ -94,6 +94,41 @@ This function creates a new instance of `AssetComputeClient` and calls `.registe
     }
 ```
 
+### Register
+After setting up the client, it is necessary to call `.register()` once before calling `.process()`.
+
+If the integration already has an I/O Events journal registered, you __still must call register__. The journal url returned from register is necessary for the client to retrieve I/O Events.
+
+If the integration does not have an I/O Events journal registered, make sure to add some wait time after calling `.register()` before calling `.process()`. (It is recommended to wait around ~30 seconds)
+```js
+const assetCompute = new AssetComputeClient(integration);
+await assetCompute.register();
+```
+
+### Unregister
+The unregister method will remove the I/O Events Journal created in `.register()`. It is necessary to call `.register()` again before attempting to use the client after unregistering.
+
+Example usage:
+```js
+const assetCompute = new AssetComputeClient(integration);
+await assetCompute.register();
+await assetCompute.process(..renditions);
+
+// unregister journal
+await assetCompute.unregister();
+
+// call to process will fail, must call `register()` again first
+try {
+    await assetCompute.process(..renditions);
+} catch (e) {
+    // expected error, must call `register()` first
+}
+
+await assetCompute.register();
+sleep(30000); // sleep after registering to give time for journal to set up
+await assetCompute.process(..renditions);
+```
+
 ### @adobe/node-fetch-retry
 Fetch retry options are documented [here](https://github.com/adobe/node-fetch-retry#optional-custom-parameters).
 
