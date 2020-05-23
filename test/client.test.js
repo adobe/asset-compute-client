@@ -332,8 +332,8 @@ describe( 'client.js tests', () => {
         }
     });
 
-    it('should implicitely call /register using createAssetComputeClient', async function() {
-        const { createAssetComputeClient } = require('../lib/client');
+    it('should implicitely call /register using AssetComputeClient.create()', async function() {
+        const { AssetComputeClient } = require('../lib/client');
 
         nock('https://asset-compute.adobe.io')
             .post('/register')
@@ -349,7 +349,7 @@ describe( 'client.js tests', () => {
                 'requestId': '3214'
             })
 
-        const assetComputeClient = await createAssetComputeClient(DEFAULT_INTEGRATION);
+        const assetComputeClient = await AssetComputeClient.create(DEFAULT_INTEGRATION);
         // process renditions
         const response = await assetComputeClient.process({
                 url: 'https://example.com/dog.jpg'

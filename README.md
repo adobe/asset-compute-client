@@ -44,7 +44,7 @@ If the integration already has an I/O Events journal registered, it is recommend
     await assetCompute.register();
 
     // add wait time for events provider to set up
-    await sleep(30000); // 30s
+    await sleep(45000); // 30s
 
     const { activationId } = await assetCompute.process(
         "https://presigned-source-url", [
@@ -65,15 +65,15 @@ If the integration already has an I/O Events journal registered, it is recommend
     }
 ```
 
-### Using `createAssetComputeClient()` for Initialization
+### Using `AssetComputeClient.create()` for Initialization
 
-This function creates a new instance of `AssetComputeClient` and calls `.register()` method.
+This function creates a new instance of `AssetComputeClient` and calls the `.register()` method.
 ```javascript
     const yaml = require("js-yaml");
-    const { createAssetComputeClient } = require("@adobe/asset-compute-client");
+    const { AssetComputeClient } = require("@adobe/asset-compute-client");
 
     const integration = yaml.safeLoad(await fs.readFile("integration.yaml", "utf-8"));
-    const assetCompute = await createAssetComputeClient(integration);
+    const assetCompute = await AssetComputeClient.create(integration);
     // add wait time if needed
     const { activationId } = await assetCompute.process(
         "https://presigned-source-url", [
@@ -99,7 +99,7 @@ After setting up the client, it is necessary to call `.register()` once before c
 
 If the integration already has an I/O Events journal registered, you __still must call register__. The journal url returned from register is necessary for the client to retrieve I/O Events.
 
-If the integration does not have an I/O Events journal registered, make sure to add some wait time after calling `.register()` before calling `.process()`. (It is recommended to wait around ~30 seconds)
+If the integration does not have an I/O Events journal registered, make sure to add some wait time after calling `.register()` before calling `.process()`. (It is recommended to wait around ~45 seconds)
 ```js
 const assetCompute = new AssetComputeClient(integration);
 await assetCompute.register();
@@ -125,7 +125,7 @@ try {
 }
 
 await assetCompute.register();
-sleep(30000); // sleep after registering to give time for journal to set up
+sleep(45000); // sleep after registering to give time for journal to set up
 await assetCompute.process(..renditions);
 ```
 
