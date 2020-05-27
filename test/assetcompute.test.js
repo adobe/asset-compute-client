@@ -55,7 +55,6 @@ describe( 'assetcompute.js tests', () => {
             accessToken: 'accessToken',
             org: 'org',
             apiKey: 'apiKey'
-
         };
         const journal = 'https://api.adobe.io/events/organizations/journal/12345';
         const requestId = '1234567890';
@@ -109,7 +108,6 @@ describe( 'assetcompute.js tests', () => {
             accessToken: 'accessToken',
             org: 'org',
             apiKey: 'apiKey'
-
         };
         const requestId = '1234567890';
         nock('https://asset-compute.adobe.io')
