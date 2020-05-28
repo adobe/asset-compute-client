@@ -14,11 +14,12 @@
 
 const { AssetCompute } = require("./lib/assetcompute");
 const { AssetComputeEventEmitter } = require("./lib/eventemitter");
-const { createAssetComputeClient, AssetComputeClient } = require("./lib/client");
+const { AssetComputeClient } = require("./lib/client");
+const { IntegrationConverter } = require('./lib/integrationconverter');
 
 module.exports = {
     AssetCompute,
     AssetComputeEventEmitter,
-    createAssetComputeClient,
-    AssetComputeClient
+    AssetComputeClient,
+    IntegrationConverter
 };
