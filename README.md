@@ -1,11 +1,12 @@
-# Asset Compute Client
+# Adobe Asset Compute Client
 
 [![Version](https://img.shields.io/npm/v/@adobe/<package-name>.svg)](https://npmjs.org/package/@adobe/asset-compute-client)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Travis](https://travis-ci.com/adobe/<package-name>.svg?branch=master)](https://travis-ci.com/adobe/asset-compute-client)
 
 ## Overview
-The Asset Compute Client is separated in 3 parts:
+
+Javascript client for the Adobe Asset Compute Service. Currently only tested with Nodejs. The Javascript API is separated in 3 parts:
 
 - [AssetCompute](lib/assetcompute.js) - A light-weight wrapper around the AssetCompute API.
 - [AssetComputeEventEmitter](lib/eventemitter.js) - Listens to an I/O event journal and converts the events to `rendition_created` and `rendition_failed` events.
