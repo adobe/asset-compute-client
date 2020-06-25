@@ -27,28 +27,18 @@ const privateKeyFile = path.join(process.cwd(), "test", "resources/privatekey.pe
 
 describe('integrationConfiguration.js tests', () => {
 
-    const expectedYaml = {
-        metascopes: ['Meta Scope 1', 'Meta Scope 2', 'Meta Scope 3'],
-        technicalAccount: {
-            id: 'Tech Id',
-            org: 'IMS Org Id',
-            clientId: 'Client Id',
-            clientSecret: 'Client Secret',
-            privateKey: '-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n'
-        }
-    };
-
-    const expectedJson = {
-        metascopes: ['Meta Scope 1', 'Meta Scope 2', 'Meta Scope 3'],
-        technicalAccount: {
-            id: 'Tech Id',
-            org: 'IMS Org Id',
-            clientId: 'Client Id',
-            clientSecret: 'Client Secret',
-            privateKey: 'PRIVATE KEY FILE\n'
-        }
-    };
     describe('YAML Input', () => {
+
+        const expectedYaml = {
+            metascopes: ['Meta Scope 1', 'Meta Scope 2', 'Meta Scope 3'],
+            technicalAccount: {
+                id: 'Tech Id',
+                org: 'IMS Org Id',
+                clientId: 'Client Id',
+                clientSecret: 'Client Secret',
+                privateKey: '-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n'
+            }
+        };
 
         it('Input file is YAML', async () => {
             const actual = await IntegrationConfiguration.getConfiguration(yamlFile);
@@ -80,68 +70,69 @@ describe('integrationConfiguration.js tests', () => {
         });
 
         it('Input file is missing properties', async () => {
-            let actual;
             const yamlFile = path.join(process.cwd(), "test", "resources/integration-missing-properties.yaml");
-            const expected = new Error(`Not all integration configuration properties are present`);
+            const expected = {
+                constructor: Error,
+                message: "Not all integration configuration properties are present"
+            };
 
-            try {
-                await IntegrationConfiguration.getConfiguration(yamlFile);
-            } catch (e) {
-                actual = e;
-            }
-
-            assert.strictEqual(actual.name, expected.name);
-            assert.strictEqual(actual.message, expected.message);
+            await assert.rejects(
+                () => IntegrationConfiguration.getConfiguration(yamlFile),
+                expected
+            );
         });
 
         it('Input file is neither JSON nor YAML', async () => {
-            let actual;
-            const expected = new Error("Not all integration configuration properties are present");
+            const expected = {
+                constructor: Error,
+                message: "Not all integration configuration properties are present"
+            };
 
-            try {
-                await IntegrationConfiguration.getConfiguration(plainTextFile);
-            } catch (e) {
-                console.log(e);
-                actual = e;
-            }
-
-            assert.strictEqual(actual.name, expected.name);
-            assert.strictEqual(actual.message, expected.message);
+            await assert.rejects(
+                () => IntegrationConfiguration.getConfiguration(plainTextFile),
+                expected
+            );
         });
 
         it('Input file does not exist', async () => {
-            let actual;
-            const expected = new Error("Missing required files");
+            const expected = {
+                constructor: Error,
+                message: "Missing required files"
+            };
 
-            try {
-                await IntegrationConfiguration.getConfiguration("fake-file.file");
-            } catch (e) {
-                console.log(e);
-                actual = e;
-            }
-
-            assert.strictEqual(actual.name, expected.name);
-            assert.strictEqual(actual.message, expected.message);
+            await assert.rejects(
+                () => IntegrationConfiguration.getConfiguration("fake-file.file"),
+                expected
+            );
         });
 
         it('Input file does not exist - ASSET_COMPUTE_INTEGRATION_FILE_PATH', async () => {
-            let actual;
-            const expected = new Error("Missing required files");
             process.env.ASSET_COMPUTE_INTEGRATION_FILE_PATH = "fake-file.file";
+            const expected = {
+                constructor: Error,
+                message: "Missing required files"
+            };
 
-            try {
-                await IntegrationConfiguration.getConfiguration();
-            } catch (e) {
-                console.log(e);
-                actual = e;
-            }
-
-            assert.strictEqual(actual.name, expected.name);
-            assert.strictEqual(actual.message, expected.message);
+            await assert.rejects(
+                () => IntegrationConfiguration.getConfiguration(),
+                expected
+            );
         });
     });
 
     describe('JSON Input', () => {
+
+        const expectedJson = {
+            metascopes: ['Meta Scope 1', 'Meta Scope 2', 'Meta Scope 3'],
+            technicalAccount: {
+                id: 'Tech Id',
+                org: 'IMS Org Id',
+                clientId: 'Client Id',
+                clientSecret: 'Client Secret',
+                privateKey: 'PRIVATE KEY FILE\n'
+            }
+        };
+
         it('Input file is JSON', async () => {
             const actual = await IntegrationConfiguration.getConfiguration(jsonFile, privateKeyFile);
 
@@ -188,64 +179,53 @@ describe('integrationConfiguration.js tests', () => {
         });
 
         it('Input file is missing properties', async () => {
-            let actual;
             const jsonFile = path.join(process.cwd(), "test", "resources/integration-missing-properties.json");
-            const expected = new Error(`Not all integration configuration properties are present`);
+            const expected = {
+                constructor: Error,
+                message: "Not all integration configuration properties are present"
+            };
 
-            try {
-                await IntegrationConfiguration.getConfiguration(jsonFile, privateKeyFile);
-            } catch (e) {
-                actual = e;
-            }
-
-            assert.strictEqual(actual.name, expected.name);
-            assert.strictEqual(actual.message, expected.message);
+            await assert.rejects(
+                () => IntegrationConfiguration.getConfiguration(jsonFile, privateKeyFile),
+                expected
+            );
         });
 
         it('Input file is neither JSON nor YAML', async () => {
-            let actual;
-            const expected = new Error("Not all integration configuration properties are present");
+            const expected = {
+                constructor: Error,
+                message: "Not all integration configuration properties are present"
+            };
 
-            try {
-                await IntegrationConfiguration.getConfiguration(plainTextFile, privateKeyFile);
-            } catch (e) {
-                console.log(e);
-                actual = e;
-            }
-
-            assert.strictEqual(actual.name, expected.name);
-            assert.strictEqual(actual.message, expected.message);
+            await assert.rejects(
+                () => IntegrationConfiguration.getConfiguration(plainTextFile, privateKeyFile),
+                expected
+            );
         });
 
         it('Private key file does not exist', async () => {
-            let actual;
-            const expected = new Error("Missing required files");
+            const expected = {
+                constructor: Error,
+                message: "Missing required files"
+            };
 
-            try {
-                await IntegrationConfiguration.getConfiguration(jsonFile, "fake-file.file");
-            } catch (e) {
-                console.log(e);
-                actual = e;
-            }
-
-            assert.strictEqual(actual.name, expected.name);
-            assert.strictEqual(actual.message, expected.message);
+            await assert.rejects(
+                () => IntegrationConfiguration.getConfiguration(jsonFile, "fake-file.file"),
+                expected
+            );
         });
 
         it('Private key file does not exist - ASSET_COMPUTE_PRIVATE_KEY_FILE_PATH', async () => {
-            let actual;
-            const expected = new Error("Missing required files");
             process.env.ASSET_COMPUTE_PRIVATE_KEY_FILE_PATH = "fake-file.file";
+            const expected = {
+                constructor: Error,
+                message: 'Missing required files'
+            };
 
-            try {
-                await IntegrationConfiguration.getConfiguration(jsonFile);
-            } catch (e) {
-                console.log(e);
-                actual = e;
-            }
-
-            assert.strictEqual(actual.name, expected.name);
-            assert.strictEqual(actual.message, expected.message);
+            await assert.rejects(
+                () => IntegrationConfiguration.getConfiguration(jsonFile),
+                expected
+            );
         });
     });
 });
