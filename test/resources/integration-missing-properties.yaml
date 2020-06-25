@@ -1,0 +1,18 @@
+consumerId: Org Id
+applicationId: Credentials Id
+metascopes:
+  - Meta Scope 1
+  - Meta Scope 2
+  - Meta Scope 3
+imsEndpoint:  IMS Endpoint
+technicalAccount:
+  id:           Tech Id
+  email:        Tech Email
+  org:          IMS Org Id
+  clientSecret: Client Secret
+  privateKey: |
+    -----BEGIN PRIVATE KEY-----
+    -----END PRIVATE KEY-----
+  publicKey: |
+    -----BEGIN CERTIFICATE-----
+    -----END CERTIFICATE-----

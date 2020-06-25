@@ -1,0 +1,62 @@
+{
+    "project": {
+        "id": "Project Id",
+        "name": "Project Name",
+        "title": "Project Title",
+        "description": "Project Description",
+        "org": {
+            "id": "Org Id",
+            "name": "Org Name",
+            "ims_org_id": "IMS Org Id"
+        },
+        "workspace": {
+            "id": "Workspace Id",
+            "name": "Workspace Name",
+            "title": "Workspace Title",
+            "description": "Workspace Description",
+            "action_url": "Workspace Action URL",
+            "app_url": "Workspace App URL",
+            "details": {
+                "credentials": [
+                    {
+                        "id": "Credentials Id",
+                        "name": "Credentials Name",
+                        "integration_type": "Credentials Service Type",
+                        "jwt": {
+                            "client_id": "Client Id",
+                            "client_secret": "Client Secret",
+                            "technical_account_email": "Tech Email",
+                            "meta_scopes": [
+                                "Meta Scope 1",
+                                "Meta Scope 2",
+                                "Meta Scope 3"
+                            ]
+                        }
+                    }
+                ],
+                "services": [
+                    {
+                        "code": "Service Code 1",
+                        "name": "Service Name 1"
+                    },
+                    {
+                        "code": "Service Code 2",
+                        "name": "Service Name 2"
+                    },
+                    {
+                        "code": "Service Code 3",
+                        "name": "Service Name 3"
+                    }
+                ],
+                "runtime": {
+                    "namespaces": [
+                        {
+                            "name": "Runtime Namespace",
+                            "auth": "Runtime Auth"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

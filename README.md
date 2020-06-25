@@ -39,7 +39,9 @@ If the integration already has an I/O Events journal registered, it is recommend
     const sleep = require('util').promisify(setTimeout);
 
 
-    const integration = yaml.safeLoad(await fs.readFile("integration.yaml", "utf-8"));
+    //If integration file is json, a private key file must also be provided
+    const integrationFilePath = "/path/to/integration/file"; // Either json or yaml format
+    const integration = AssetComputeClient.getConfiguration(integrationFilePath[, privateKeyFile]);
     const assetCompute = new AssetComputeClient(integration);
 
     // Call register before first call the process
@@ -74,7 +76,9 @@ This function creates a new instance of `AssetComputeClient` and calls the `.reg
     const yaml = require("js-yaml");
     const { AssetComputeClient } = require("@adobe/asset-compute-client");
 
-    const integration = yaml.safeLoad(await fs.readFile("integration.yaml", "utf-8"));
+    //If integration file is json, a private key file must also be provided
+    const integrationFilePath = "/path/to/integration/file"; // Either json or yaml format
+    const integration = AssetComputeClient.getConfiguration(integrationFilePath[, privateKeyFile]);
     const assetCompute = await AssetComputeClient.create(integration);
     // add wait time if needed
     const { activationId } = await assetCompute.process(
