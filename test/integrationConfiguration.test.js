@@ -18,7 +18,7 @@
 const assert = require('assert');
 const path = require('path');
 
-const IntegrationConfiguration = require('../lib/integrationConfiguration.js');
+const IntegrationConfiguration = require(`../lib/integrationConfiguration`);
 
 const plainTextFile = path.join(process.cwd(), "test", "resources/plain-text-file.txt");
 const yamlFile = path.join(process.cwd(), "test", "resources/integration.yaml");
