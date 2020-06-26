@@ -15,11 +15,11 @@
 const { AssetCompute } = require("./lib/assetcompute");
 const { AssetComputeEventEmitter } = require("./lib/eventemitter");
 const { AssetComputeClient } = require("./lib/client");
-const { YamlConverter } = require('./lib/yamlconverter');
+const { getIntegrationConfiguration } = require('./lib/integrationConfiguration');
 
 module.exports = {
     AssetCompute,
     AssetComputeEventEmitter,
     AssetComputeClient,
-    YamlConverter
+    getIntegrationConfiguration
 };
