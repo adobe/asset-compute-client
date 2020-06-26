@@ -49,7 +49,7 @@ If the integration already has an I/O Events journal registered, it is recommend
     // add wait time for events provider to set up
     await sleep(45000); // 30s
 
-    const { activationId } = await assetCompute.process(
+    const { requestId } = await assetCompute.process(
         "https://presigned-source-url", [
             {
                 name: "rendition.png",
@@ -60,7 +60,7 @@ If the integration already has an I/O Events journal registered, it is recommend
             }
         ]
     )
-    const events = await assetCompute.waitActivation(activationId);
+    const events = await assetCompute.waitActivation(requestId);
     if (events[0].type === "rendition_created") {
         // use the rendition
     } else {
@@ -79,7 +79,7 @@ This function creates a new instance of `AssetComputeClient` and calls the `.reg
     const integration = await getIntegrationConfiguration(integrationFilePath[, privateKeyFile]);
     const assetCompute = await AssetComputeClient.create(integration);
     // add wait time if needed
-    const { activationId } = await assetCompute.process(
+    const { requestId } = await assetCompute.process(
         "https://presigned-source-url", [
             {
                 name: "rendition.png",
@@ -90,7 +90,7 @@ This function creates a new instance of `AssetComputeClient` and calls the `.reg
             }
         ]
     )
-    const events = await assetCompute.waitActivation(activationId);
+    const events = await assetCompute.waitActivation(requestId);
     if (events[0].type === "rendition_created") {
         // use the rendition
     } else {
