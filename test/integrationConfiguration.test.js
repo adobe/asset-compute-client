@@ -36,12 +36,12 @@ describe('integrationConfiguration.js tests', () => {
                 org: 'IMS Org Id',
                 clientId: 'Client Id',
                 clientSecret: 'Client Secret',
-                privateKey: '-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n'
+                privateKey: new RegExp(/-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n/)
             }
         };
 
         it('Input file is YAML', async () => {
-            const actual = await IntegrationConfiguration.getConfiguration(yamlFile);
+            const actual = await IntegrationConfiguration.getIntegrationConfiguration(yamlFile);
 
             assert.strictEqual(actual.metascopes[0], expectedYaml.metascopes[0]);
             assert.strictEqual(actual.metascopes[1], expectedYaml.metascopes[1]);
@@ -51,12 +51,12 @@ describe('integrationConfiguration.js tests', () => {
             assert.strictEqual(actual.technicalAccount.org, expectedYaml.technicalAccount.org);
             assert.strictEqual(actual.technicalAccount.clientId, expectedYaml.technicalAccount.clientId);
             assert.strictEqual(actual.technicalAccount.clientSecret, expectedYaml.technicalAccount.clientSecret);
-            assert.strictEqual(actual.technicalAccount.privateKey, expectedYaml.technicalAccount.privateKey);
+            assert.strictEqual(expectedYaml.technicalAccount.privateKey.test(actual.technicalAccount.privateKey), true);
         });
 
         it('Input file is YAML - ASSET_COMPUTE_INTEGRATION_FILE_PATH', async () => {
             process.env.ASSET_COMPUTE_INTEGRATION_FILE_PATH = yamlFile;
-            const actual = await IntegrationConfiguration.getConfiguration();
+            const actual = await IntegrationConfiguration.getIntegrationConfiguration();
 
             assert.strictEqual(actual.metascopes[0], expectedYaml.metascopes[0]);
             assert.strictEqual(actual.metascopes[1], expectedYaml.metascopes[1]);
@@ -66,7 +66,7 @@ describe('integrationConfiguration.js tests', () => {
             assert.strictEqual(actual.technicalAccount.org, expectedYaml.technicalAccount.org);
             assert.strictEqual(actual.technicalAccount.clientId, expectedYaml.technicalAccount.clientId);
             assert.strictEqual(actual.technicalAccount.clientSecret, expectedYaml.technicalAccount.clientSecret);
-            assert.strictEqual(actual.technicalAccount.privateKey, expectedYaml.technicalAccount.privateKey);
+            assert.strictEqual(expectedYaml.technicalAccount.privateKey.test(actual.technicalAccount.privateKey), true);
         });
 
         it('Input file is missing properties', async () => {
@@ -77,7 +77,7 @@ describe('integrationConfiguration.js tests', () => {
             };
 
             await assert.rejects(
-                () => IntegrationConfiguration.getConfiguration(yamlFile),
+                () => IntegrationConfiguration.getIntegrationConfiguration(yamlFile),
                 expected
             );
         });
@@ -89,7 +89,7 @@ describe('integrationConfiguration.js tests', () => {
             };
 
             await assert.rejects(
-                () => IntegrationConfiguration.getConfiguration(plainTextFile),
+                () => IntegrationConfiguration.getIntegrationConfiguration(plainTextFile),
                 expected
             );
         });
@@ -101,7 +101,7 @@ describe('integrationConfiguration.js tests', () => {
             };
 
             await assert.rejects(
-                () => IntegrationConfiguration.getConfiguration("fake-file.file"),
+                () => IntegrationConfiguration.getIntegrationConfiguration("fake-file.file"),
                 expected
             );
         });
@@ -114,7 +114,7 @@ describe('integrationConfiguration.js tests', () => {
             };
 
             await assert.rejects(
-                () => IntegrationConfiguration.getConfiguration(),
+                () => IntegrationConfiguration.getIntegrationConfiguration(),
                 expected
             );
         });
@@ -129,12 +129,12 @@ describe('integrationConfiguration.js tests', () => {
                 org: 'IMS Org Id',
                 clientId: 'Client Id',
                 clientSecret: 'Client Secret',
-                privateKey: 'PRIVATE KEY FILE\n'
+                privateKey: new RegExp(/PRIVATE KEY FILE\n/)
             }
         };
 
         it('Input file is JSON', async () => {
-            const actual = await IntegrationConfiguration.getConfiguration(jsonFile, privateKeyFile);
+            const actual = await IntegrationConfiguration.getIntegrationConfiguration(jsonFile, privateKeyFile);
 
             assert.strictEqual(actual.metascopes[0], expectedJson.metascopes[0]);
             assert.strictEqual(actual.metascopes[1], expectedJson.metascopes[1]);
@@ -144,13 +144,13 @@ describe('integrationConfiguration.js tests', () => {
             assert.strictEqual(actual.technicalAccount.org, expectedJson.technicalAccount.org);
             assert.strictEqual(actual.technicalAccount.clientId, expectedJson.technicalAccount.clientId);
             assert.strictEqual(actual.technicalAccount.clientSecret, expectedJson.technicalAccount.clientSecret);
-            assert.strictEqual(actual.technicalAccount.privateKey, expectedJson.technicalAccount.privateKey);
+            assert.strictEqual(expectedJson.technicalAccount.privateKey.test(actual.technicalAccount.privateKey), true);
         });
 
         it('Input file is JSON - ASSET_COMPUTE_INTEGRATION_FILE_PATH & ASSET_COMPUTE_PRIVATE_KEY_FILE_PATH', async () => {
             process.env.ASSET_COMPUTE_INTEGRATION_FILE_PATH = jsonFile;
             process.env.ASSET_COMPUTE_PRIVATE_KEY_FILE_PATH = privateKeyFile;
-            const actual = await IntegrationConfiguration.getConfiguration();
+            const actual = await IntegrationConfiguration.getIntegrationConfiguration();
 
             assert.strictEqual(actual.metascopes[0], expectedJson.metascopes[0]);
             assert.strictEqual(actual.metascopes[1], expectedJson.metascopes[1]);
@@ -160,12 +160,12 @@ describe('integrationConfiguration.js tests', () => {
             assert.strictEqual(actual.technicalAccount.org, expectedJson.technicalAccount.org);
             assert.strictEqual(actual.technicalAccount.clientId, expectedJson.technicalAccount.clientId);
             assert.strictEqual(actual.technicalAccount.clientSecret, expectedJson.technicalAccount.clientSecret);
-            assert.strictEqual(actual.technicalAccount.privateKey, expectedJson.technicalAccount.privateKey);
+            assert.strictEqual(expectedJson.technicalAccount.privateKey.test(actual.technicalAccount.privateKey), true);
         });
 
         it('Input file is JSON - ASSET_COMPUTE_PRIVATE_KEY_FILE_PATH', async () => {
             process.env.ASSET_COMPUTE_PRIVATE_KEY_FILE_PATH = privateKeyFile;
-            const actual = await IntegrationConfiguration.getConfiguration(jsonFile);
+            const actual = await IntegrationConfiguration.getIntegrationConfiguration(jsonFile);
 
             assert.strictEqual(actual.metascopes[0], expectedJson.metascopes[0]);
             assert.strictEqual(actual.metascopes[1], expectedJson.metascopes[1]);
@@ -175,7 +175,7 @@ describe('integrationConfiguration.js tests', () => {
             assert.strictEqual(actual.technicalAccount.org, expectedJson.technicalAccount.org);
             assert.strictEqual(actual.technicalAccount.clientId, expectedJson.technicalAccount.clientId);
             assert.strictEqual(actual.technicalAccount.clientSecret, expectedJson.technicalAccount.clientSecret);
-            assert.strictEqual(actual.technicalAccount.privateKey, expectedJson.technicalAccount.privateKey);
+            assert.strictEqual(expectedJson.technicalAccount.privateKey.test(actual.technicalAccount.privateKey), true);
         });
 
         it('Input file is missing properties', async () => {
@@ -186,7 +186,7 @@ describe('integrationConfiguration.js tests', () => {
             };
 
             await assert.rejects(
-                () => IntegrationConfiguration.getConfiguration(jsonFile, privateKeyFile),
+                () => IntegrationConfiguration.getIntegrationConfiguration(jsonFile, privateKeyFile),
                 expected
             );
         });
@@ -198,7 +198,7 @@ describe('integrationConfiguration.js tests', () => {
             };
 
             await assert.rejects(
-                () => IntegrationConfiguration.getConfiguration(plainTextFile, privateKeyFile),
+                () => IntegrationConfiguration.getIntegrationConfiguration(plainTextFile, privateKeyFile),
                 expected
             );
         });
@@ -210,7 +210,7 @@ describe('integrationConfiguration.js tests', () => {
             };
 
             await assert.rejects(
-                () => IntegrationConfiguration.getConfiguration(jsonFile, "fake-file.file"),
+                () => IntegrationConfiguration.getIntegrationConfiguration(jsonFile, "fake-file.file"),
                 expected
             );
         });
@@ -223,7 +223,7 @@ describe('integrationConfiguration.js tests', () => {
             };
 
             await assert.rejects(
-                () => IntegrationConfiguration.getConfiguration(jsonFile),
+                () => IntegrationConfiguration.getIntegrationConfiguration(jsonFile),
                 expected
             );
         });
