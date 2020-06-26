@@ -11,6 +11,7 @@ Jenkinsfile
 stryker.conf.js
 build/
 .travis.yml
+coverage.lcov
 
 # npm pack leftovers
 *.tgz
