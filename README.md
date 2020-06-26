@@ -55,8 +55,8 @@ If the integration already has an I/O Events journal registered, it is recommend
                 name: "rendition.png",
                 url: "https://presigned-target-url",
                 fmt: "png",
-                wid: 200,
-                hei: 200
+                width: 200,
+                height: 200
             }
         ]
     )
@@ -85,8 +85,8 @@ This function creates a new instance of `AssetComputeClient` and calls the `.reg
                 name: "rendition.png",
                 url: "https://presigned-target-url",
                 fmt: "png",
-                wid: 200,
-                hei: 200
+                width: 200,
+                height: 200
             }
         ]
     )
