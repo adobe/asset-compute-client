@@ -36,7 +36,7 @@ describe('integrationConfiguration.js tests', () => {
                 org: 'IMS Org Id',
                 clientId: 'Client Id',
                 clientSecret: 'Client Secret',
-                privateKey: new RegExp(/-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n/)
+                privateKey: new RegExp(/-----BEGIN PRIVATE KEY-----\r?\n-----END PRIVATE KEY-----\r?\n/)
             }
         };
 
@@ -129,7 +129,7 @@ describe('integrationConfiguration.js tests', () => {
                 org: 'IMS Org Id',
                 clientId: 'Client Id',
                 clientSecret: 'Client Secret',
-                privateKey: new RegExp(/PRIVATE KEY FILE\n/)
+                privateKey: new RegExp(/PRIVATE KEY FILE\r?\n/)
             }
         };
 
