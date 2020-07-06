@@ -1,6 +1,6 @@
 {
     "name": "@adobe/asset-compute-client",
-    "description": "Adobe Asset Compute Client",
+    "description": "Adobe Asset Compute Client_cicd",
     "version": "4.3.0",
     "license": "Apache-2.0",
     "main": "index.js",
