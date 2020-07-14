@@ -44,7 +44,15 @@ describe('client.js tests', () => {
                     return '123456';
                 }
             },
-            AdobeIOEvents: class AdobeIOEventsMock { },
+            AdobeIOEvents: class AdobeIOEventsMock { 
+                async getEventsFromJournal(url) {
+                    if(url === 'JOURNAL_NOT_READY') {
+                        throw Error('504');
+                    } else {
+                        return 'JOURNAL_READY';
+                    }
+                }
+            },
             AdobeIOEventEmitter: class AdobeIOEventEmitterMock {
                 on() {
                     return {
@@ -448,6 +456,33 @@ describe('client.js tests', () => {
         ]);
         assert.ok(assetComputeClient._registered);
         assert.strictEqual(response.requestId, '3214');
+        await assetComputeClient.close();
+    });
+
+    it('should throw error if event provider journal is not ready', async function () {
+        const { AssetComputeClient } = require('../lib/client');
+        const journalUrl = 'JOURNAL_NOT_READY';
+        const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
+        try {
+            await assetComputeClient.checkEventJournal(journalUrl);
+        } catch(e) {
+            console.log(e);
+            assert.ok(e.message.includes('504'));
+        }
+        await assetComputeClient.close();
+    });
+
+    it('should return valid event if provider ready', async function () {
+        const { AssetComputeClient } = require('../lib/client');
+        const journalUrl = 'JOURNAL_READY';
+        const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
+        try {
+            await assetComputeClient.checkEventJournal(journalUrl);
+            assert.ok('checkEventJournal call successful');
+        } catch(e) {
+            console.log(e);
+            assert.ok(e.message.includes('504'));
+        }
         await assetComputeClient.close();
     });
 
