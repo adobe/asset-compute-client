@@ -463,12 +463,8 @@ describe('client.js tests', () => {
         const { AssetComputeClient } = require('../lib/client');
         const journalUrl = 'JOURNAL_NOT_READY';
         const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
-        try {
-            await assetComputeClient.checkEventJournal(journalUrl);
-        } catch(e) {
-            console.log(e);
-            assert.ok(e.message.includes('504'));
-        }
+        const isReady = await assetComputeClient.isEventJournalReady(journalUrl);
+        assert.ok(!isReady);
         await assetComputeClient.close();
     });
 
@@ -476,13 +472,8 @@ describe('client.js tests', () => {
         const { AssetComputeClient } = require('../lib/client');
         const journalUrl = 'JOURNAL_READY';
         const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
-        try {
-            await assetComputeClient.checkEventJournal(journalUrl);
-            assert.ok('checkEventJournal call successful');
-        } catch(e) {
-            console.log(e);
-            assert.ok(e.message.includes('504'));
-        }
+        const isReady = await assetComputeClient.isEventJournalReady(journalUrl);
+        assert.ok(isReady);
         await assetComputeClient.close();
     });
 
