@@ -47,9 +47,13 @@ describe('client.js tests', () => {
             AdobeIOEvents: class AdobeIOEventsMock { 
                 async getEventsFromJournal(url) {
                     if(url === 'JOURNAL_NOT_READY') {
-                        throw Error('504');
+                        throw Error('get journal events failed with 500 Internal server error');
                     } else {
-                        return 'JOURNAL_READY';
+                        return {
+                            event: {
+                                type: 'rendition_created'
+                            }
+                        };
                     }
                 }
             },
@@ -461,18 +465,20 @@ describe('client.js tests', () => {
 
     it('should throw error if event provider journal is not ready', async function () {
         const { AssetComputeClient } = require('../lib/client');
-        const journalUrl = 'JOURNAL_NOT_READY';
+        // const journalUrl = 'JOURNAL_NOT_READY';
         const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
-        const isReady = await assetComputeClient.isEventJournalReady(journalUrl);
+        assetComputeClient.journal = 'JOURNAL_NOT_READY';
+        const isReady = await assetComputeClient.isEventJournalReady();
         assert.ok(!isReady);
         await assetComputeClient.close();
     });
 
     it('should return valid event if provider ready', async function () {
         const { AssetComputeClient } = require('../lib/client');
-        const journalUrl = 'JOURNAL_READY';
+        // const journalUrl = 'JOURNAL_READY';
         const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
-        const isReady = await assetComputeClient.isEventJournalReady(journalUrl);
+        assetComputeClient.journal = 'JOURNAL_READY';
+        const isReady = await assetComputeClient.isEventJournalReady();
         assert.ok(isReady);
         await assetComputeClient.close();
     });
