@@ -465,7 +465,6 @@ describe('client.js tests', () => {
 
     it('should throw error if event provider journal is not ready', async function () {
         const { AssetComputeClient } = require('../lib/client');
-        // const journalUrl = 'JOURNAL_NOT_READY';
         const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
         assetComputeClient.journal = 'JOURNAL_NOT_READY';
         const isReady = await assetComputeClient.isEventJournalReady();
@@ -475,7 +474,6 @@ describe('client.js tests', () => {
 
     it('should return valid event if provider ready', async function () {
         const { AssetComputeClient } = require('../lib/client');
-        // const journalUrl = 'JOURNAL_READY';
         const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
         assetComputeClient.journal = 'JOURNAL_READY';
         const isReady = await assetComputeClient.isEventJournalReady();
