@@ -68,6 +68,27 @@ If the integration already has an I/O Events journal registered, it is recommend
     }
 ```
 
+#### Error message printing
+
+Note that any errors while polling the I/O Event journal will be logged before it retries:
+
+```
+Error polling event journal: request to https://events-va6.adobe.io/.... failed, reason: connect ECONNREFUSED 54.81.231.29:443
+```
+
+To add custom error message handling, listen for the `error` event:
+
+```js
+assetCompute.on("error", error => console.log("custom error message", error.message));
+```
+
+Or disable any error message output:
+
+```js
+assetCompute.on("error", () => {});
+```
+
+
 ### Using `AssetComputeClient.create()` for Initialization
 
 This function creates a new instance of `AssetComputeClient` and calls the `.register()` method.
