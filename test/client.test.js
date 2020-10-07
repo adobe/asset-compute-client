@@ -561,14 +561,14 @@ describe('client.js event emitting', () => {
 
         // IMPORTANT - this test is NOT listening for 'error' events to test NUI-878
         //             hence this line below needs to stay commented out, just left for illustrational purposes
-        //             we want to test with a consumer who does NOT listen for error evetns
+        //             we want to test with a consumer who does NOT listen for error events
         // assetComputeClient.on("error", e => console.log(e));
 
         // first simulate a network error
         ioEventEmitterMock.emit("error", new Error("Network issue"));
 
         // then simulate io event
-        const event = {type: "rendition_created", custom: "Hello world" };
+        const event = { type: "rendition_created", custom: "Hello world" };
         ioEventEmitterMock.emit("event", buildEvent(event, assetComputeClient, requestId));
 
         const events = await waitPromise;
