@@ -18,6 +18,7 @@
 const mockRequire = require('mock-require');
 const assert = require('assert');
 const nock = require('nock');
+const { EventEmitter } = require('events');
 
 const DEFAULT_INTEGRATION = {
     applicationId: 72515,
@@ -44,7 +45,7 @@ describe('client.js tests', () => {
                     return '123456';
                 }
             },
-            AdobeIOEvents: class AdobeIOEventsMock { 
+            AdobeIOEvents: class AdobeIOEventsMock {
                 async getEventsFromJournal(url) {
                     if(url === 'JOURNAL_NOT_READY') {
                         throw Error('get journal events failed with 500 Internal server error');
@@ -481,4 +482,100 @@ describe('client.js tests', () => {
         await assetComputeClient.close();
     });
 
+});
+
+describe('client.js event emitting', () => {
+
+    function buildEvent(event, assetComputeClient, requestId) {
+        const userData = {
+            assetComputeClient: {
+                id: assetComputeClient.id,
+                index: 0,
+                length: 1
+            }
+        };
+        event.userData = userData;
+        event.rendition = event.rendition || {};
+        event.rendition.userData = userData;
+        event.requestId = requestId;
+        return {
+            event: event
+        };
+    }
+
+    afterEach(function() {
+        mockRequire.stopAll();
+        nock.cleanAll();
+    });
+
+    it('should retry on journal errors if no error listener is registered (NUI-878)', async function () {
+        let ioEventEmitterMock;
+
+        // mock underlying io events lib so we can emit our own events
+        mockRequire("@adobe/asset-compute-events-client", {
+            AdobeAuth: class AdobeAuthMock {
+                createAccessToken() {
+                    return '123456';
+                }
+            },
+            AdobeIOEvents: class AdobeIOEventsMock {},
+            AdobeIOEventEmitter: class AdobeIOEventEmitterMock extends EventEmitter {
+                constructor() {
+                    super();
+                    ioEventEmitterMock = this;
+                }
+                stop() {}
+            }
+        });
+        mockRequire.reRequire("../lib/eventemitter");
+        const { AssetComputeClient } = mockRequire.reRequire("../lib/client");
+
+        nock('https://asset-compute.adobe.io')
+            .post('/register')
+            .reply(200, {
+                'ok': true,
+                'journal': 'https://api.adobe.io/events/organizations/journal/12345',
+                'requestId': '1234'
+            });
+        nock('https://asset-compute.adobe.io')
+            .post('/process')
+            .reply(200, {
+                'ok': true,
+                'requestId': '3214'
+            });
+
+        // const { AssetComputeClient } = require('../lib/client');
+        const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
+
+        await assetComputeClient.register();
+        const { requestId } = await assetComputeClient.process(
+            {
+                url: 'https://example.com/dog.jpg'
+            },[{
+                name: 'rendition.jpg',
+                fmt: 'jpg'
+            }]
+        );
+
+        const waitPromise = assetComputeClient.waitActivation(requestId, 100);
+
+        // IMPORTANT - this test is NOT listening for 'error' events to test NUI-878
+        //             hence this line below needs to stay commented out, just left for illustrational purposes
+        //             we want to test with a consumer who does NOT listen for error events
+        // assetComputeClient.on("error", e => console.log(e));
+
+        // first simulate a network error
+        ioEventEmitterMock.emit("error", new Error("Network issue"));
+
+        // then simulate io event
+        const event = { type: "rendition_created", custom: "Hello world" };
+        ioEventEmitterMock.emit("event", buildEvent(event, assetComputeClient, requestId));
+
+        const events = await waitPromise;
+        await assetComputeClient.close();
+
+        assert.strictEqual(events.length, 1);
+        assert.strictEqual(events[0].type, "rendition_created");
+        assert.strictEqual(events[0].custom, "Hello world");
+    });
 });
