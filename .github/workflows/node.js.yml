@@ -33,4 +33,5 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - uses: actions/checkout@v2
     - run: npx @adobe/sizewatcher
