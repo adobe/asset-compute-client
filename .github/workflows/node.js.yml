@@ -33,5 +33,4 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - run: npm i @adobe/sizewatcher --no-save
     - run: npx @adobe/sizewatcher
