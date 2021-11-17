@@ -34,7 +34,7 @@ const DEFAULT_INTEGRATION = {
     imsEndpoint: 'https://ims-na1-stage.adobelogin.com'
 };
 
-describe('client.js tests', () => {
+describe('client-retry.js retry on 429 tests', () => {
     before(() => {
         mockRequire.stopAll();
         nock.cleanAll();
@@ -72,36 +72,283 @@ describe('client.js tests', () => {
             }
         });
         mockRequire.reRequire('../lib/client');
+        mockRequire.reRequire('../lib/client-retry');
     });
+
     afterEach(() => {
         mockRequire.stopAll();
         nock.cleanAll();
     });
-    it('should create asset compute client with custom retryOptions', async function () {
-        const { AssetComputeClient } = require('../lib/client');
+    it('should create asset compute client with retry on 429s', async function () {
+        const { AssetComputeClientRetry } = require('../lib/client-retry');
+        nock('https://asset-compute.adobe.io')
+            .post('/register')
+            .reply(200, {});
+
+        const assetComputeClient = new AssetComputeClientRetry(DEFAULT_INTEGRATION);
+        await assetComputeClient.initialize();
+        assert.equal(assetComputeClient.max429RetryCount, 4);
+    });
+    it('should create asset compute client with retry on 429s and custom retry logic', async function () {
+        const { AssetComputeClientRetry } = require('../lib/client-retry');
         const options = {
-            retryOptions: {
-                retryMaxDuration: 1000
-            }
+            max429RetryCount: 10
         };
         nock('https://asset-compute.adobe.io')
             .post('/register')
             .reply(200, {});
 
-        const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION, options);
+        const assetComputeClient = new AssetComputeClientRetry(DEFAULT_INTEGRATION, options);
         await assetComputeClient.initialize();
-        assert.equal(assetComputeClient.assetCompute.retryOptions.retryMaxDuration, 1000);
+        assert.equal(assetComputeClient.max429RetryCount, 10);
+    });
+    it('should fail retrying calling /register on 429s', async function () {
+        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+        const options = {
+            max429RetryCount: 1
+        };
+        // retries once, resulting in exactly 2 calls to /register
+        nock('https://asset-compute.adobe.io')
+            .post('/register')
+            .twice()
+            .reply(429,{
+                ok: false,
+                error_code:'429050',
+                message:'Too many requests'
+            }, {
+                'retry-after': 1 // 1s is the smallest amount possible
+            });
+        const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION, options);
+        try {
+            await assetComputeClient.register();
+            assert.fail('Should have failed');
+        } catch (error) {
+            assert.strictEqual(error.message, 'Running into 429s. Will not continue testing. Try re-running in a few minutes.');
+        }
+        assert.ok(nock.isDone());
+    }).timeout(5000);
+    it('should succeed after retrying call to /register on 429s', async function () {
+        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+        const options = {
+            max429RetryCount: 1
+        };
+        // retries once, resulting in exactly 2 calls to /register
+        nock('https://asset-compute.adobe.io')
+            .post('/register')
+            .reply(429,{
+                ok: false,
+                error_code:'429050',
+                message:'Too many requests'
+            }, {
+                'retry-after': 1 // 1s is the smallest amount possible
+            });
+        nock('https://asset-compute.adobe.io')
+            .post('/register')
+            .reply(200, {
+                'ok': true,
+                'journal': 'https://api.adobe.io/events/organizations/journal/12345',
+                'requestId': '1234'
+            });
+        const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION, options);
+        const { requestId } = await assetComputeClient.register();
+        assert.strictEqual(requestId, '1234');
+        assert.ok(assetComputeClient._registered);
+        assert.ok(nock.isDone());
+    }).timeout(5000);
+    it('should fail retrying calling /unregister on 429s', async function () {
+        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+        const options = {
+            max429RetryCount: 1
+        };
+        // retries once, resulting in exactly 2 calls to /register
+        nock('https://asset-compute.adobe.io')
+            .post('/unregister')
+            .twice()
+            .reply(429,{
+                ok: false,
+                error_code:'429050',
+                message:'Too many requests'
+            }, {
+                'retry-after': 1 // 1s is the smallest amount possible
+            });
+        const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION, options);
+        try {
+            await assetComputeClient.unregister();
+            assert.fail('Should have failed');
+        } catch (error) {
+            assert.strictEqual(error.message, 'Running into 429s. Will not continue testing. Try re-running in a few minutes.');
+        }
+        assert.ok(nock.isDone());
+    }).timeout(5000);
+    it('should succeed after retrying call to /unregister on 429s', async function () {
+        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+        const options = {
+            max429RetryCount: 1
+        };
+        // retries once, resulting in exactly 2 calls to /register
+        nock('https://asset-compute.adobe.io')
+            .post('/unregister')
+            .reply(429,{
+                ok: false,
+                error_code:'429050',
+                message:'Too many requests'
+            }, {
+                'retry-after': 1 // 1s is the smallest amount possible
+            });
+        nock('https://asset-compute.adobe.io')
+            .post('/unregister')
+            .reply(200, {
+                'ok': true,
+                'requestId': '4321'
+            });
+        const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION, options);
+        const { requestId } = await assetComputeClient.unregister();
+        assert.strictEqual(requestId, '4321');
+        assert.ok(!assetComputeClient._registered);
+        assert.ok(nock.isDone());
+    }).timeout(5000);
+    it('should fail retrying calling /process on 429s', async function () {
+        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+        const options = {
+            max429RetryCount: 1
+        };
+
+        nock('https://asset-compute.adobe.io')
+            .post('/register')
+            .reply(200, {
+                'ok': true,
+                'journal': 'https://api.adobe.io/events/organizations/journal/12345',
+                'requestId': '1234'
+            });
+        // retries once, resulting in exactly 2 calls to /register
+        nock('https://asset-compute.adobe.io')
+            .post('/process')
+            .twice()
+            .reply(429,{
+                ok: false,
+                error_code:'429050',
+                message:'Too many requests'
+            }, {
+                'retry-after': 1 // 1s is the smallest amount possible
+            });
+        const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION, options);
+        try {
+            // call /register before calling /process
+            await assetComputeClient.register();
+            assert.ok(assetComputeClient._registered);
+
+            await assetComputeClient.process({
+                url: 'https://example.com/dog.jpg'
+            },
+            [
+                {
+                    name: 'rendition.jpg',
+                    fmt: 'jpg'
+                }
+            ]);
+            assert.fail('Should have failed');
+        } catch (error) {
+            assert.strictEqual(error.message, 'Running into 429s. Will not continue testing. Try re-running in a few minutes.');
+        }
+        assert.ok(nock.isDone());
+    }).timeout(5000);
+    it('should succeed after retrying call to /process on 429s', async function () {
+        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+        const options = {
+            max429RetryCount: 1
+        };
+        nock('https://asset-compute.adobe.io')
+            .post('/register')
+            .reply(200, {
+                'ok': true,
+                'journal': 'https://api.adobe.io/events/organizations/journal/12345',
+                'requestId': '1234'
+            });
+        // retries once, resulting in exactly 2 calls to /register
+        nock('https://asset-compute.adobe.io')
+            .post('/process')
+            .reply(429,{
+                ok: false,
+                error_code:'429050',
+                message:'Too many requests'
+            }, {
+                'retry-after': 1 // 1s is the smallest amount possible
+            });
+        nock('https://asset-compute.adobe.io')
+            .post('/process')
+            .reply(200, {
+                'ok': true,
+                'requestId': '3214'
+            });
+        const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION, options);
+        // call /register before calling /process
+        await assetComputeClient.register();
+        assert.ok(assetComputeClient._registered);
+
+        // process renditions
+        const response = await assetComputeClient.process({
+            url: 'https://example.com/dog.jpg'
+        },
+        [
+            {
+                name: 'rendition.jpg',
+                fmt: 'jpg'
+            }
+        ]);
+        assert.strictEqual(response.requestId, '3214');
+        assert.ok(assetComputeClient.eventEmitter);
+        assert.ok(nock.isDone());
+    }).timeout(5000);
+});
+// Should work the exact same as AssetComputeClient
+// run all the AssetComputeClient tests here using AssetComputeRetry
+describe('client.js tests run with AssetComputeClientRetry', () => {
+    before(() => {
+        mockRequire.stopAll();
+        nock.cleanAll();
+        mockRequire("@adobe/asset-compute-events-client", {
+            AdobeAuth: class AdobeAuthMock {
+                constructor(config) {
+                    this.adobeLoginHost = config.adobeLoginHost;
+                }
+                async createAccessToken() {
+                    return '123456';
+                }
+            },
+            AdobeIOEvents: class AdobeIOEventsMock {
+                async getEventsFromJournal(url) {
+                    if(url === 'JOURNAL_NOT_READY') {
+                        throw Error('get journal events failed with 500 Internal server error');
+                    } else {
+                        return {
+                            event: {
+                                type: 'rendition_created'
+                            }
+                        };
+                    }
+                }
+            },
+            AdobeIOEventEmitter: class AdobeIOEventEmitterMock {
+                on() {
+                    return {
+                        event: {
+                            type: 'rendition_created'
+                        }
+                    };
+                }
+                stop() { }
+            }
+        });
+        mockRequire.reRequire('../lib/client');
+        mockRequire.reRequire('../lib/client-retry');
     });
 
-    it('should create asset compute client with ims endpoint in integration', async function () {
-        const { AssetComputeClient } = require('../lib/client');
-        const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
-        assert.ok(assetComputeClient.auth);
-        assert.equal(assetComputeClient.auth.adobeLoginHost, 'https://ims-na1-stage.adobelogin.com');
+    afterEach(() => {
+        mockRequire.stopAll();
+        nock.cleanAll();
     });
-
-    it('should create asset compute client with ims endpoint in options', async function () {
-        const { AssetComputeClient } = require('../lib/client');
+    it('[AssetComputeClientRetry] should create asset compute client with ims endpoint in options', async function () {
+        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
         const integration = {
             applicationId: 72515,
             consumerId: 105979,
@@ -114,22 +361,31 @@ describe('client.js tests', () => {
                 privateKey: 'privateKey'
             }
         };
-        const assetComputeClient = new AssetComputeClient(integration, { imsEndpoint: 'https://ims-na1-stage.adobelogin.com' });
+        const options = {
+            retryOptions: {
+                retryMaxDuration: 1000
+            },
+            imsEndpoint: 'https://ims-na1-stage.adobelogin.com'
+        };
+        nock('https://asset-compute.adobe.io')
+            .post('/register')
+            .reply(200, {});
+        const assetComputeClient = new AssetComputeClient(integration, options);
+        await assetComputeClient.initialize();
         assert.ok(assetComputeClient.auth);
         assert.equal(assetComputeClient.auth.adobeLoginHost, 'https://ims-na1-stage.adobelogin.com');
+        assert.equal(assetComputeClient.assetCompute.retryOptions.retryMaxDuration, 1000);
     });
-
-    it('should fail to create asset compute client with missing integration', async function () {
-        const { AssetComputeClient } = require('../lib/client');
+    it('[AssetComputeClientRetry] should fail to create asset compute client with missing integration', async function () {
+        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
         try {
             new AssetComputeClient();
         } catch (e) {
             assert.ok(e.message.includes('Asset Compute integration'));
         }
     });
-
-    it('should call /register and then /unregister', async function () {
-        const { AssetComputeClient } = require('../lib/client');
+    it('[AssetComputeClientRetry] should call /register and then /unregister', async function () {
+        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
 
         nock('https://asset-compute.adobe.io')
             .post('/register')
@@ -150,8 +406,8 @@ describe('client.js tests', () => {
         assert.strictEqual(requestId, '4321');
     });
 
-    it('should call /register, /process, then /unregister', async function () {
-        const { AssetComputeClient } = require('../lib/client');
+    it('[AssetComputeClientRetry] should call /register, /process, then /unregister', async function () {
+        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
 
         nock('https://asset-compute.adobe.io')
             .post('/register')
@@ -197,8 +453,8 @@ describe('client.js tests', () => {
         assert.ok(!assetComputeClient._registered);
     });
 
-    it('should call /register, /process, then /unregister multiple times', async function () {
-        const { AssetComputeClient } = require('../lib/client');
+    it('[AssetComputeClientRetry] should call /register, /process, then /unregister multiple times', async function () {
+        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
 
         nock('https://asset-compute.adobe.io')
             .post('/register')
@@ -279,8 +535,8 @@ describe('client.js tests', () => {
         assert.ok(!assetComputeClient.eventEmitter);
     });
 
-    it('calling /register twice has no effect', async function () {
-        const { AssetComputeClient } = require('../lib/client');
+    it('[AssetComputeClientRetry] calling /register twice has no effect', async function () {
+        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
 
         nock('https://asset-compute.adobe.io')
             .post('/register')
@@ -325,8 +581,8 @@ describe('client.js tests', () => {
         assert.strictEqual(response.requestId, '3214');
     });
 
-    it('should fail to call /process without calling /register ', async function () {
-        const { AssetComputeClient } = require('../lib/client');
+    it('[AssetComputeClientRetry] should fail to call /process without calling /register ', async function () {
+        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
 
         const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
         // process renditions
@@ -347,8 +603,8 @@ describe('client.js tests', () => {
         }
     });
 
-    it('should implicitely call /register using AssetComputeClient.create()', async function () {
-        const { AssetComputeClient } = require('../lib/client');
+    it('[AssetComputeClientRetry] should implicitely call /register using AssetComputeClient.create()', async function () {
+        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
 
         nock('https://asset-compute.adobe.io')
             .post('/register')
@@ -377,10 +633,11 @@ describe('client.js tests', () => {
         ]);
         assert.strictEqual(response.requestId, '3214');
         assert.ok(assetComputeClient._registered);
+        assert.ok(nock.isDone());
     });
 
-    it('should fail calling /unregister without calling /register first', async function () {
-        const { AssetComputeClient } = require('../lib/client');
+    it('[AssetComputeClientRetry] should fail calling /unregister without calling /register first', async function () {
+        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
 
         const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
         nock('https://asset-compute.adobe.io')
@@ -396,8 +653,8 @@ describe('client.js tests', () => {
         }
     });
 
-    it('should fail /process after calling /unregister', async function () {
-        const { AssetComputeClient } = require('../lib/client');
+    it('[AssetComputeClientRetry] should fail /process after calling /unregister', async function () {
+        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
         nock('https://asset-compute.adobe.io')
             .post('/register')
             .reply(200, {
@@ -432,8 +689,8 @@ describe('client.js tests', () => {
         }
     });
 
-    it('should call `close()` when finished with asset compute client', async function () {
-        const { AssetComputeClient } = require('../lib/client');
+    it('[AssetComputeClientRetry] should call `close()` when finished with asset compute client', async function () {
+        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
 
         nock('https://asset-compute.adobe.io')
             .post('/register')
@@ -466,8 +723,8 @@ describe('client.js tests', () => {
         await assetComputeClient.close();
     });
 
-    it('should throw error if event provider journal is not ready', async function () {
-        const { AssetComputeClient } = require('../lib/client');
+    it('[AssetComputeClientRetry] should throw error if event provider journal is not ready', async function () {
+        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
         const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
         assetComputeClient.journal = 'JOURNAL_NOT_READY';
         const isReady = await assetComputeClient.isEventJournalReady();
@@ -475,8 +732,8 @@ describe('client.js tests', () => {
         await assetComputeClient.close();
     });
 
-    it('should return valid event if provider ready', async function () {
-        const { AssetComputeClient } = require('../lib/client');
+    it('[AssetComputeClientRetry] should return valid event if provider ready', async function () {
+        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
         const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
         assetComputeClient.journal = 'JOURNAL_READY';
         const isReady = await assetComputeClient.isEventJournalReady();
@@ -486,7 +743,11 @@ describe('client.js tests', () => {
 
 });
 
-describe('client.js event emitting', () => {
+describe('client.js event emitting run with AssetComputeClientRetry', () => {
+    before(() => {
+        mockRequire.stopAll();
+        nock.cleanAll();
+    });
     function buildEvent(event, assetComputeClient, requestId) {
         const userData = {
             assetComputeClient: {
@@ -509,7 +770,7 @@ describe('client.js event emitting', () => {
         nock.cleanAll();
     });
 
-    it('should retry on journal errors if no error listener is registered (NUI-878)', async function () {
+    it('[AssetComputeClientRetry] should retry on journal errors if no error listener is registered (NUI-878)', async function () {
         let ioEventEmitterMock;
 
         // mock underlying io events lib so we can emit our own events
@@ -529,7 +790,8 @@ describe('client.js event emitting', () => {
             }
         });
         mockRequire.reRequire("../lib/eventemitter");
-        const { AssetComputeClient } = mockRequire.reRequire("../lib/client");
+        mockRequire.reRequire("../lib/client");
+        const { AssetComputeClientRetry } = mockRequire.reRequire('../lib/client-retry');
 
         nock('https://asset-compute.adobe.io')
             .post('/register')
@@ -545,8 +807,7 @@ describe('client.js event emitting', () => {
                 'requestId': '3214'
             });
 
-        // const { AssetComputeClient } = require('../lib/client');
-        const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
+        const assetComputeClient = new AssetComputeClientRetry(DEFAULT_INTEGRATION);
 
         await assetComputeClient.register();
         const { requestId } = await assetComputeClient.process(

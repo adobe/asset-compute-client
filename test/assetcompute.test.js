@@ -48,6 +48,32 @@ describe( 'assetcompute.js tests', () => {
         assert.strictEqual(response.requestId, requestId);
         assert.strictEqual(response.journal, journal);
     });
+    it('should fail with asset compute /register hits 429', async function() {
+        const { AssetCompute } = require('../lib/assetcompute');
+        const options = {
+            accessToken: 'accessToken',
+            org: 'org',
+            apiKey: 'apiKey'
+
+        };
+        nock('https://asset-compute.adobe.io')
+            .post('/register')
+            .reply(429,{
+                ok: false,
+                error_code:'429050',
+                message:'Too many requests'
+            }, {
+                'retry-after': 3
+            });
+
+        const assetCompute = new AssetCompute(options);
+        try {
+            await assetCompute.register();
+        } catch (error) {
+            assert.strictEqual(error.message, 'Unable to invoke /register: 429 {"ok":false,"error_code":"429050","message":"Too many requests"}');
+            assert.strictEqual(error.retryAfter, 3);
+        }
+    });
 
     it('should call asset compute /unregister successfully', async function() {
         const { AssetCompute } = require('../lib/assetcompute');
@@ -102,7 +128,34 @@ describe( 'assetcompute.js tests', () => {
         }
     });
 
-    it('should fail calling /process', async function() {
+    it('should fail with asset compute /unregister hits 429', async function() {
+        const { AssetCompute } = require('../lib/assetcompute');
+        const options = {
+            accessToken: 'accessToken',
+            org: 'org',
+            apiKey: 'apiKey'
+
+        };
+        nock('https://asset-compute.adobe.io')
+            .post('/unregister')
+            .reply(429,{
+                ok: false,
+                error_code:'429050',
+                message:'Too many requests'
+            }, {
+                'retry-after': 3
+            });
+
+        const assetCompute = new AssetCompute(options);
+        try {
+            await assetCompute.unregister();
+        } catch (error) {
+            assert.strictEqual(error.message, 'Unable to invoke /unregister: 429: {"ok":false,"error_code":"429050","message":"Too many requests"} (details: {"size":0,"timeout":30000})');
+            assert.strictEqual(error.retryAfter, 3);
+        }
+    });
+
+    it('should fail calling /process with 401', async function() {
         const { AssetCompute } = require('../lib/assetcompute');
         const options = {
             accessToken: 'accessToken',
@@ -132,6 +185,41 @@ describe( 'assetcompute.js tests', () => {
             assert.fail('Should have failed');
         } catch (e) {
             assert.ok(e.message.includes('401'));
+        }
+    });
+    it('should fail calling /process with 429', async function() {
+        const { AssetCompute } = require('../lib/assetcompute');
+        const options = {
+            accessToken: 'accessToken',
+            org: 'org',
+            apiKey: 'apiKey'
+        };
+        nock('https://asset-compute.adobe.io')
+            .post('/process')
+            .reply(429,{
+                ok: false,
+                error_code:'429050',
+                message:'Too many requests'
+            }, {
+                'retry-after': 3
+            });
+
+
+        const assetCompute = new AssetCompute(options);
+        try {
+            await assetCompute.process({
+                url: 'https://example.com/dog.jpg'
+            },
+            [
+                {
+                    name: 'rendition.jpg',
+                    fmt: 'jpg'
+                }
+            ]);
+            assert.fail('Should have failed');
+        } catch (e) {
+            assert.strictEqual(e.message, 'Unable to invoke /process: 429 {"ok":false,"error_code":"429050","message":"Too many requests"}');
+            assert.strictEqual(e.retryAfter, 3);
         }
     });
 });
