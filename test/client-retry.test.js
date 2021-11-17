@@ -79,7 +79,7 @@ describe('client-retry.js retry on 429 tests', () => {
         mockRequire.stopAll();
         nock.cleanAll();
     });
-    it('should create asset compute client with retry on 429s', async function () {
+    it('should create asset compute client with default config retry on 429s', async function () {
         const { AssetComputeClientRetry } = require('../lib/client-retry');
         nock('https://asset-compute.adobe.io')
             .post('/register')
@@ -123,7 +123,7 @@ describe('client-retry.js retry on 429 tests', () => {
             await assetComputeClient.register();
             assert.fail('Should have failed');
         } catch (error) {
-            assert.strictEqual(error.message, 'Running into 429s. Will not continue retrying. Try again in a few minutes.');
+            assert.strictEqual(error.message, 'Running into 429s after 2 attempts. Will not continue retrying. Try again in a few minutes.');
         }
         assert.ok(nock.isDone());
     }).timeout(5000);
@@ -176,7 +176,7 @@ describe('client-retry.js retry on 429 tests', () => {
             await assetComputeClient.unregister();
             assert.fail('Should have failed');
         } catch (error) {
-            assert.strictEqual(error.message, 'Running into 429s. Will not continue retrying. Try again in a few minutes.');
+            assert.strictEqual(error.message, 'Running into 429s after 2 attempts. Will not continue retrying. Try again in a few minutes.');
         }
         assert.ok(nock.isDone());
     }).timeout(5000);
@@ -248,7 +248,7 @@ describe('client-retry.js retry on 429 tests', () => {
             ]);
             assert.fail('Should have failed');
         } catch (error) {
-            assert.strictEqual(error.message, 'Running into 429s. Will not continue retrying. Try again in a few minutes.');
+            assert.strictEqual(error.message, 'Running into 429s after 2 attempts. Will not continue retrying. Try again in a few minutes.');
         }
         assert.ok(nock.isDone());
     }).timeout(5000);
