@@ -11,6 +11,7 @@ Javascript client for the Adobe Asset Compute Service. Currently only tested wit
 - [AssetCompute](lib/assetcompute.js) - A light-weight wrapper around the AssetCompute API.
 - [AssetComputeEventEmitter](lib/eventemitter.js) - Listens to an I/O event journal and converts the events to `rendition_created` and `rendition_failed` events.
 - [AssetComputeClient](lib/client.js) - A higher level client that provides a simpler API
+- [AssetComputeClientRetry](lib/client-retry.js) - A wrapper around `AssetComputeClient` that provides smarter retry behavior for 429s.
 
 AssetComputeClient has the following capabilities:
 
@@ -20,6 +21,11 @@ AssetComputeClient has the following capabilities:
 - Wait for a single Asset Compute process request to finish (default timeout is 60s)
 - Wait for all Asset Compute process requests to finish (default timeout is 60s)
 
+AssetComputeClientRetry has the following capabilities:
+- Works exactly like the `AssetComputeClient` with extra features to retry on 429s for `/unregister`, `/register`, and `/process`
+- Looks at the `retry-after` header in the HTTP response to determine how long to wait (in seconds) before retrying
+- If no `retry-after` is present, choose a random wait time between 30-60 seconds
+- Configurable retry count via `max429RetryCount` option. (Defaults to 4 retries)
 ## Installation
 
 ```
@@ -153,9 +159,49 @@ await assetCompute.register();
 sleep(45000); // sleep after registering to give time for journal to set up
 await assetCompute.process(..renditions);
 ```
+### Using AssetComputeClientRetry
+`AssetComputeClientRetry` can be used exactly the same way as `AssetComputeClient`:
+```js
+const { AssetComputeClientRetry } = require("@adobe/asset-compute-client");
+
+const assetCompute = new AssetComputeClientRetry(integration);
+await assetCompute.register();
+await assetCompute.process(..renditions);
+
+// unregister journal
+await assetCompute.unregister();
+
+// call to process will fail, must call `register()` again first
+try {
+    await assetCompute.process(..renditions);
+} catch (e) {
+    // expected error, must call `register()` first
+}
+
+await assetCompute.register();
+sleep(45000); // sleep after registering to give time for journal to set up
+await assetCompute.process(..renditions);
+```
+
+Or import it as `AssetComputeClient` to avoid changing the name everywhere in the code:
+```js
+const { AssetComputeClientRetry: AssetComputeClient } = require("@adobe/asset-compute-client");
+
+const assetCompute = new AssetComputeClient(integration);
+await assetCompute.register();
+```
+
+You can customize the retry on 429 options:
+```js
+const assetCompute = new AssetComputeClient(integration, {
+    max429RetryCount: 10
+});
+```
 
 ### @adobe/node-fetch-retry
 Fetch retry options are documented [here](https://github.com/adobe/node-fetch-retry#optional-custom-parameters).
+
+Note: these do not cover retrying on 429s since this requires smarter retry logic (ie, retrying every 1s with backoff could worsen the issue in a situation when the endpoint is overloaded)
 
 
 ### Contributing
