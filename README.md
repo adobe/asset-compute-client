@@ -11,7 +11,7 @@ Javascript client for the Adobe Asset Compute Service. Currently only tested wit
 - [AssetCompute](lib/assetcompute.js) - A light-weight wrapper around the AssetCompute API.
 - [AssetComputeEventEmitter](lib/eventemitter.js) - Listens to an I/O event journal and converts the events to `rendition_created` and `rendition_failed` events.
 - [AssetComputeClient](lib/client.js) - A higher level client that provides a simpler API
-- [AssetComputeClientRetry](lib/client-retry.js) - A wrapper around `AssetComputeClient` that provides smarter retry behavior for 429s.
+- [AssetComputeClientRetry](lib/client-retry.js) - A wrapper around `AssetComputeClient` that provides smarter retry behavior on HTTP status code 429 (Too many requests).
 
 AssetComputeClient has the following capabilities:
 
@@ -22,7 +22,7 @@ AssetComputeClient has the following capabilities:
 - Wait for all Asset Compute process requests to finish (default timeout is 60s)
 
 AssetComputeClientRetry has the following capabilities:
-- Works exactly like the `AssetComputeClient` with extra features to retry on 429s for `/unregister`, `/register`, and `/process`
+- Works exactly like the `AssetComputeClient` with additional features to retry on 429s for `/unregister`, `/register`, and `/process`
 - Looks at the `retry-after` header in the HTTP response to determine how long to wait (in seconds) before retrying
 - If no `retry-after` is present, choose a random wait time between 30-60 seconds
 - Configurable retry count via `max429RetryCount` option. (Defaults to 4 retries)
