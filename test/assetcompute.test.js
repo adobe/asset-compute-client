@@ -48,7 +48,7 @@ describe( 'assetcompute.js tests', () => {
         assert.strictEqual(response.requestId, requestId);
         assert.strictEqual(response.journal, journal);
     });
-    it('should fail with asset compute /register hits 429', async function() {
+    it('should fail without retry when asset compute /register hits 429', async function() {
         const { AssetCompute } = require('../lib/assetcompute');
         const options = {
             accessToken: 'accessToken',
