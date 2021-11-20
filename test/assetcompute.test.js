@@ -48,7 +48,7 @@ describe( 'assetcompute.js tests', () => {
         assert.strictEqual(response.requestId, requestId);
         assert.strictEqual(response.journal, journal);
     });
-    it('should calling asset compute /register with 401', async function() {
+    it('should fail calling asset compute /register with 401', async function() {
         const options = {
             accessToken: 'accessToken',
             org: 'org',
