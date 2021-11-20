@@ -80,17 +80,17 @@ describe('client-retry.js retry on 429 tests', () => {
         nock.cleanAll();
     });
     it('should create asset compute client with default config retry on 429s', async function () {
-        const { AssetComputeClientRetry } = require('../lib/client-retry');
+        const { AssetComputeClientWithRetry } = require('../lib/client-retry');
         nock('https://asset-compute.adobe.io')
             .post('/register')
             .reply(200, {});
 
-        const assetComputeClient = new AssetComputeClientRetry(DEFAULT_INTEGRATION);
+        const assetComputeClient = new AssetComputeClientWithRetry(DEFAULT_INTEGRATION);
         await assetComputeClient.initialize();
         assert.equal(assetComputeClient.max429RetryCount, 4);
     });
     it('should create asset compute client with retry on 429s and custom retry logic', async function () {
-        const { AssetComputeClientRetry } = require('../lib/client-retry');
+        const { AssetComputeClientWithRetry } = require('../lib/client-retry');
         const options = {
             max429RetryCount: 10
         };
@@ -98,12 +98,12 @@ describe('client-retry.js retry on 429 tests', () => {
             .post('/register')
             .reply(200, {});
 
-        const assetComputeClient = new AssetComputeClientRetry(DEFAULT_INTEGRATION, options);
+        const assetComputeClient = new AssetComputeClientWithRetry(DEFAULT_INTEGRATION, options);
         await assetComputeClient.initialize();
         assert.equal(assetComputeClient.max429RetryCount, 10);
     });
     it('should fail retrying calling /register on 429s', async function () {
-        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+        const { AssetComputeClientWithRetry: AssetComputeClient } = require('../lib/client-retry');
         const options = {
             max429RetryCount: 1
         };
@@ -128,7 +128,7 @@ describe('client-retry.js retry on 429 tests', () => {
         assert.ok(nock.isDone());
     }).timeout(5000);
     it('should succeed after retrying call to /register on 429s', async function () {
-        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+        const { AssetComputeClientWithRetry: AssetComputeClient } = require('../lib/client-retry');
         const options = {
             max429RetryCount: 1
         };
@@ -156,7 +156,7 @@ describe('client-retry.js retry on 429 tests', () => {
         assert.ok(nock.isDone());
     }).timeout(5000);
     it('should fail retrying calling /unregister on 429s', async function () {
-        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+        const { AssetComputeClientWithRetry: AssetComputeClient } = require('../lib/client-retry');
         const options = {
             max429RetryCount: 1
         };
@@ -181,7 +181,7 @@ describe('client-retry.js retry on 429 tests', () => {
         assert.ok(nock.isDone());
     }).timeout(5000);
     it('should succeed after retrying call to /unregister on 429s', async function () {
-        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+        const { AssetComputeClientWithRetry: AssetComputeClient } = require('../lib/client-retry');
         const options = {
             max429RetryCount: 1
         };
@@ -208,7 +208,7 @@ describe('client-retry.js retry on 429 tests', () => {
         assert.ok(nock.isDone());
     }).timeout(5000);
     it('should fail retrying calling /process on 429s', async function () {
-        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+        const { AssetComputeClientWithRetry: AssetComputeClient } = require('../lib/client-retry');
         const options = {
             max429RetryCount: 1
         };
@@ -253,7 +253,7 @@ describe('client-retry.js retry on 429 tests', () => {
         assert.ok(nock.isDone());
     }).timeout(5000);
     it('should succeed after retrying call to /process on 429s', async function () {
-        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+        const { AssetComputeClientWithRetry: AssetComputeClient } = require('../lib/client-retry');
         const options = {
             max429RetryCount: 1
         };
@@ -302,7 +302,7 @@ describe('client-retry.js retry on 429 tests', () => {
 });
 // Should work the exact same as AssetComputeClient
 // run all the AssetComputeClient tests here using AssetComputeRetry
-describe('client.js tests run with AssetComputeClientRetry', () => {
+describe('client.js tests run with AssetComputeClientWithRetry', () => {
     before(() => {
         mockRequire.stopAll();
         nock.cleanAll();
@@ -347,8 +347,8 @@ describe('client.js tests run with AssetComputeClientRetry', () => {
         mockRequire.stopAll();
         nock.cleanAll();
     });
-    it('[AssetComputeClientRetry] should create asset compute client with ims endpoint in options', async function () {
-        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+    it('[AssetComputeClientWithRetry] should create asset compute client with ims endpoint in options', async function () {
+        const { AssetComputeClientWithRetry: AssetComputeClient } = require('../lib/client-retry');
         const integration = {
             applicationId: 72515,
             consumerId: 105979,
@@ -376,16 +376,16 @@ describe('client.js tests run with AssetComputeClientRetry', () => {
         assert.equal(assetComputeClient.auth.adobeLoginHost, 'https://ims-na1-stage.adobelogin.com');
         assert.equal(assetComputeClient.assetCompute.retryOptions.retryMaxDuration, 1000);
     });
-    it('[AssetComputeClientRetry] should fail to create asset compute client with missing integration', async function () {
-        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+    it('[AssetComputeClientWithRetry] should fail to create asset compute client with missing integration', async function () {
+        const { AssetComputeClientWithRetry: AssetComputeClient } = require('../lib/client-retry');
         try {
             new AssetComputeClient();
         } catch (e) {
             assert.ok(e.message.includes('Asset Compute integration'));
         }
     });
-    it('[AssetComputeClientRetry] should call /register and then /unregister', async function () {
-        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+    it('[AssetComputeClientWithRetry] should call /register and then /unregister', async function () {
+        const { AssetComputeClientWithRetry: AssetComputeClient } = require('../lib/client-retry');
 
         nock('https://asset-compute.adobe.io')
             .post('/register')
@@ -406,8 +406,8 @@ describe('client.js tests run with AssetComputeClientRetry', () => {
         assert.strictEqual(requestId, '4321');
     });
 
-    it('[AssetComputeClientRetry] should call /register, /process, then /unregister', async function () {
-        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+    it('[AssetComputeClientWithRetry] should call /register, /process, then /unregister', async function () {
+        const { AssetComputeClientWithRetry: AssetComputeClient } = require('../lib/client-retry');
 
         nock('https://asset-compute.adobe.io')
             .post('/register')
@@ -453,8 +453,8 @@ describe('client.js tests run with AssetComputeClientRetry', () => {
         assert.ok(!assetComputeClient._registered);
     });
 
-    it('[AssetComputeClientRetry] should call /register, /process, then /unregister multiple times', async function () {
-        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+    it('[AssetComputeClientWithRetry] should call /register, /process, then /unregister multiple times', async function () {
+        const { AssetComputeClientWithRetry: AssetComputeClient } = require('../lib/client-retry');
 
         nock('https://asset-compute.adobe.io')
             .post('/register')
@@ -535,8 +535,8 @@ describe('client.js tests run with AssetComputeClientRetry', () => {
         assert.ok(!assetComputeClient.eventEmitter);
     });
 
-    it('[AssetComputeClientRetry] calling /register twice has no effect', async function () {
-        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+    it('[AssetComputeClientWithRetry] calling /register twice has no effect', async function () {
+        const { AssetComputeClientWithRetry: AssetComputeClient } = require('../lib/client-retry');
 
         nock('https://asset-compute.adobe.io')
             .post('/register')
@@ -581,8 +581,8 @@ describe('client.js tests run with AssetComputeClientRetry', () => {
         assert.strictEqual(response.requestId, '3214');
     });
 
-    it('[AssetComputeClientRetry] should fail to call /process without calling /register ', async function () {
-        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+    it('[AssetComputeClientWithRetry] should fail to call /process without calling /register ', async function () {
+        const { AssetComputeClientWithRetry: AssetComputeClient } = require('../lib/client-retry');
 
         const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
         // process renditions
@@ -603,8 +603,8 @@ describe('client.js tests run with AssetComputeClientRetry', () => {
         }
     });
 
-    it('[AssetComputeClientRetry] should implicitely call /register using AssetComputeClient.create()', async function () {
-        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+    it('[AssetComputeClientWithRetry] should implicitely call /register using AssetComputeClient.create()', async function () {
+        const { AssetComputeClientWithRetry: AssetComputeClient } = require('../lib/client-retry');
 
         nock('https://asset-compute.adobe.io')
             .post('/register')
@@ -636,8 +636,8 @@ describe('client.js tests run with AssetComputeClientRetry', () => {
         assert.ok(nock.isDone());
     });
 
-    it('[AssetComputeClientRetry] should fail calling /unregister without calling /register first', async function () {
-        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+    it('[AssetComputeClientWithRetry] should fail calling /unregister without calling /register first', async function () {
+        const { AssetComputeClientWithRetry: AssetComputeClient } = require('../lib/client-retry');
 
         const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
         nock('https://asset-compute.adobe.io')
@@ -653,8 +653,8 @@ describe('client.js tests run with AssetComputeClientRetry', () => {
         }
     });
 
-    it('[AssetComputeClientRetry] should fail /process after calling /unregister', async function () {
-        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+    it('[AssetComputeClientWithRetry] should fail /process after calling /unregister', async function () {
+        const { AssetComputeClientWithRetry: AssetComputeClient } = require('../lib/client-retry');
         nock('https://asset-compute.adobe.io')
             .post('/register')
             .reply(200, {
@@ -689,8 +689,8 @@ describe('client.js tests run with AssetComputeClientRetry', () => {
         }
     });
 
-    it('[AssetComputeClientRetry] should call `close()` when finished with asset compute client', async function () {
-        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+    it('[AssetComputeClientWithRetry] should call `close()` when finished with asset compute client', async function () {
+        const { AssetComputeClientWithRetry: AssetComputeClient } = require('../lib/client-retry');
 
         nock('https://asset-compute.adobe.io')
             .post('/register')
@@ -723,8 +723,8 @@ describe('client.js tests run with AssetComputeClientRetry', () => {
         await assetComputeClient.close();
     });
 
-    it('[AssetComputeClientRetry] should throw error if event provider journal is not ready', async function () {
-        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+    it('[AssetComputeClientWithRetry] should throw error if event provider journal is not ready', async function () {
+        const { AssetComputeClientWithRetry: AssetComputeClient } = require('../lib/client-retry');
         const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
         assetComputeClient.journal = 'JOURNAL_NOT_READY';
         const isReady = await assetComputeClient.isEventJournalReady();
@@ -732,8 +732,8 @@ describe('client.js tests run with AssetComputeClientRetry', () => {
         await assetComputeClient.close();
     });
 
-    it('[AssetComputeClientRetry] should return valid event if provider ready', async function () {
-        const { AssetComputeClientRetry: AssetComputeClient } = require('../lib/client-retry');
+    it('[AssetComputeClientWithRetry] should return valid event if provider ready', async function () {
+        const { AssetComputeClientWithRetry: AssetComputeClient } = require('../lib/client-retry');
         const assetComputeClient = new AssetComputeClient(DEFAULT_INTEGRATION);
         assetComputeClient.journal = 'JOURNAL_READY';
         const isReady = await assetComputeClient.isEventJournalReady();
@@ -743,7 +743,7 @@ describe('client.js tests run with AssetComputeClientRetry', () => {
 
 });
 
-describe('client.js event emitting run with AssetComputeClientRetry', () => {
+describe('client.js event emitting run with AssetComputeClientWithRetry', () => {
     before(() => {
         mockRequire.stopAll();
         nock.cleanAll();
@@ -770,7 +770,7 @@ describe('client.js event emitting run with AssetComputeClientRetry', () => {
         nock.cleanAll();
     });
 
-    it('[AssetComputeClientRetry] should retry on journal errors if no error listener is registered (NUI-878)', async function () {
+    it('[AssetComputeClientWithRetry] should retry on journal errors if no error listener is registered (NUI-878)', async function () {
         let ioEventEmitterMock;
 
         // mock underlying io events lib so we can emit our own events
@@ -791,7 +791,7 @@ describe('client.js event emitting run with AssetComputeClientRetry', () => {
         });
         mockRequire.reRequire("../lib/eventemitter");
         mockRequire.reRequire("../lib/client");
-        const { AssetComputeClientRetry } = mockRequire.reRequire('../lib/client-retry');
+        const { AssetComputeClientWithRetry } = mockRequire.reRequire('../lib/client-retry');
 
         nock('https://asset-compute.adobe.io')
             .post('/register')
@@ -807,7 +807,7 @@ describe('client.js event emitting run with AssetComputeClientRetry', () => {
                 'requestId': '3214'
             });
 
-        const assetComputeClient = new AssetComputeClientRetry(DEFAULT_INTEGRATION);
+        const assetComputeClient = new AssetComputeClientWithRetry(DEFAULT_INTEGRATION);
 
         await assetComputeClient.register();
         const { requestId } = await assetComputeClient.process(
