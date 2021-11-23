@@ -79,6 +79,21 @@ describe('client-retry.js retry on 429 tests', () => {
         mockRequire.stopAll();
         nock.cleanAll();
     });
+    it('retryWaitTime tests', async function () {
+        const { AssetComputeClientWithRetry } = require('../lib/client-retry');
+
+        const assetComputeClient = new AssetComputeClientWithRetry(DEFAULT_INTEGRATION);
+
+        // retry-after is passed through
+        let waitTime = assetComputeClient.retryWaitTime(3);
+        assert.ok( waitTime >= 3000, waitTime <= 4000);
+        // retry-after is passed through in seconds and convertted to ms
+        waitTime = assetComputeClient.retryWaitTime(30);
+        assert.ok( waitTime >= 30000, waitTime <= 40000);
+        // retry-after is undefined
+        waitTime = assetComputeClient.retryWaitTime();
+        assert.ok(waitTime >= 30000, waitTime <= 61000);
+    });
     it('should create asset compute client with default config retry on 429s', async function () {
         const { AssetComputeClientWithRetry } = require('../lib/client-retry');
         nock('https://asset-compute.adobe.io')
