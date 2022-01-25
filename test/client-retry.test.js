@@ -23,7 +23,7 @@ const { EventEmitter } = require('events');
 const DEFAULT_INTEGRATION = {
     applicationId: 72515,
     consumerId: 105979,
-    metascopes: ['event_receiver_api', 'ent_adobeio_sdk', 'asset_compute_meta'],
+    metascopes: ['mocked-metascope-1', 'mocked-metascope-2', 'mocked-metascope-3'],
     technicalAccount: {
         id: 'id',
         org: 'org',
@@ -31,7 +31,7 @@ const DEFAULT_INTEGRATION = {
         clientSecret: 'clientSecret',
         privateKey: 'privateKey'
     },
-    imsEndpoint: 'https://ims-na1-stage.adobelogin.com'
+    imsEndpoint: 'https://mocked-ims-endpoint.com'
 };
 
 describe('client-retry.js retry on 429 tests', () => {
@@ -367,7 +367,7 @@ describe('client.js tests run with AssetComputeClientWithRetry', () => {
         const integration = {
             applicationId: 72515,
             consumerId: 105979,
-            metascopes: ['event_receiver_api', 'ent_adobeio_sdk', 'asset_compute_meta'],
+            metascopes: ['mocked-metascope-1', 'mocked-metascope-2', 'mocked-metascope-3'],
             technicalAccount: {
                 id: 'id',
                 org: 'org',
@@ -380,7 +380,7 @@ describe('client.js tests run with AssetComputeClientWithRetry', () => {
             retryOptions: {
                 retryMaxDuration: 1000
             },
-            imsEndpoint: 'https://ims-na1-stage.adobelogin.com'
+            imsEndpoint: 'https://mocked-ims-endpoint.com'
         };
         nock('https://asset-compute.adobe.io')
             .post('/register')
@@ -388,7 +388,7 @@ describe('client.js tests run with AssetComputeClientWithRetry', () => {
         const assetComputeClient = new AssetComputeClient(integration, options);
         await assetComputeClient.initialize();
         assert.ok(assetComputeClient.auth);
-        assert.equal(assetComputeClient.auth.adobeLoginHost, 'https://ims-na1-stage.adobelogin.com');
+        assert.equal(assetComputeClient.auth.adobeLoginHost, 'https://mocked-ims-endpoint.com');
         assert.equal(assetComputeClient.assetCompute.retryOptions.retryMaxDuration, 1000);
     });
     it('[AssetComputeClientWithRetry] should fail to create asset compute client with missing integration', async function () {
