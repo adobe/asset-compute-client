@@ -19,6 +19,7 @@ const mockRequire = require('mock-require');
 const assert = require('assert');
 const nock = require('nock');
 const { EventEmitter } = require('events');
+const rewire = require('rewire');
 
 const DEFAULT_INTEGRATION = {
     applicationId: 72515,
@@ -80,18 +81,17 @@ describe('client-retry.js retry on 429 tests', () => {
         nock.cleanAll();
     });
     it('retryWaitTime tests', async function () {
-        const { AssetComputeClientWithRetry } = require('../lib/client-retry');
-
-        const assetComputeClient = new AssetComputeClientWithRetry(DEFAULT_INTEGRATION);
+        const rewiredRetry = rewire('../lib/client-retry');
+        const retryWaitTime = rewiredRetry.__get__('retryWaitTime');
 
         // retry-after is passed through
-        let waitTime = assetComputeClient.retryWaitTime(3);
+        let waitTime = retryWaitTime(3);
         assert.ok( waitTime >= 3000, waitTime <= 4000);
         // retry-after is passed through in seconds and convertted to ms
-        waitTime = assetComputeClient.retryWaitTime(30);
+        waitTime = retryWaitTime(30);
         assert.ok( waitTime >= 30000, waitTime <= 40000);
         // retry-after is undefined
-        waitTime = assetComputeClient.retryWaitTime();
+        waitTime = retryWaitTime();
         assert.ok(waitTime >= 30000, waitTime <= 61000);
     });
     it('should create asset compute client with default config retry on 429s', async function () {
@@ -99,7 +99,7 @@ describe('client-retry.js retry on 429 tests', () => {
 
         const assetComputeClient = new AssetComputeClientWithRetry(DEFAULT_INTEGRATION);
         await assetComputeClient.initialize();
-        assert.equal(assetComputeClient.max429RetryCount, 4);
+        assert.equal(assetComputeClient.options.max429RetryCount, 4);
     });
     it('should create asset compute client with retry on 429s and custom retry logic', async function () {
         const { AssetComputeClientWithRetry } = require('../lib/client-retry');
@@ -109,7 +109,7 @@ describe('client-retry.js retry on 429 tests', () => {
 
         const assetComputeClient = new AssetComputeClientWithRetry(DEFAULT_INTEGRATION, options);
         await assetComputeClient.initialize();
-        assert.equal(assetComputeClient.max429RetryCount, 10);
+        assert.equal(assetComputeClient.options.max429RetryCount, 10);
     });
     it('should fail retrying calling /register on 429s', async function () {
         const { AssetComputeClientWithRetry: AssetComputeClient } = require('../lib/client-retry');
