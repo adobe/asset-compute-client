@@ -72,6 +72,7 @@ describe('client.js tests', () => {
             }
         });
         mockRequire.reRequire('../lib/client');
+        mockRequire.reRequire('../lib/retry');
     });
     afterEach(() => {
         mockRequire.stopAll();

@@ -15,7 +15,6 @@
 const { AssetCompute } = require("./lib/assetcompute");
 const { AssetComputeEventEmitter } = require("./lib/eventemitter");
 const { AssetComputeClient } = require("./lib/client");
-const { AssetComputeClientWithRetry } = require("./lib/client-retry");
 const { getIntegrationConfiguration } = require('./lib/integrationConfiguration');
 const { TooManyRequestsError } = require('./lib/error');
 
@@ -23,7 +22,6 @@ module.exports = {
     AssetCompute,
     AssetComputeEventEmitter,
     AssetComputeClient,
-    AssetComputeClientWithRetry,
     getIntegrationConfiguration,
     TooManyRequestsError
 };

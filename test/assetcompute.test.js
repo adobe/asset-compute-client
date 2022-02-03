@@ -72,10 +72,12 @@ describe( 'assetcompute.js tests', () => {
         }
     });
     it('should fail without retry when asset compute /register hits 429', async function() {
+        // TODO, add option to not retry on 429
         const options = {
             accessToken: 'accessToken',
             org: 'org',
-            apiKey: 'apiKey'
+            apiKey: 'apiKey',
+            disable429Retry: true
 
         };
         nock('https://asset-compute.adobe.io')
@@ -102,7 +104,8 @@ describe( 'assetcompute.js tests', () => {
         const options = {
             accessToken: 'accessToken',
             org: 'org',
-            apiKey: 'apiKey'
+            apiKey: 'apiKey',
+            disable429Retry: true
 
         };
         nock('https://asset-compute.adobe.io')
@@ -130,7 +133,8 @@ describe( 'assetcompute.js tests', () => {
         const options = {
             accessToken: 'accessToken',
             org: 'org',
-            apiKey: 'apiKey'
+            apiKey: 'apiKey',
+            disable429Retry: true
 
         };
         nock('https://asset-compute.adobe.io')
@@ -158,7 +162,8 @@ describe( 'assetcompute.js tests', () => {
         const options = {
             accessToken: 'accessToken',
             org: 'org',
-            apiKey: 'apiKey'
+            apiKey: 'apiKey',
+            disable429Retry: true
 
         };
         nock('https://asset-compute.adobe.io')
@@ -185,7 +190,8 @@ describe( 'assetcompute.js tests', () => {
         const options = {
             accessToken: 'accessToken',
             org: 'org',
-            apiKey: 'apiKey'
+            apiKey: 'apiKey',
+            disable429Retry: true
 
         };
         nock('https://asset-compute.adobe.io')
@@ -263,7 +269,8 @@ describe( 'assetcompute.js tests', () => {
         const options = {
             accessToken: 'accessToken',
             org: 'org',
-            apiKey: 'apiKey'
+            apiKey: 'apiKey',
+            disable429Retry: true
 
         };
         nock('https://asset-compute.adobe.io')
@@ -322,7 +329,8 @@ describe( 'assetcompute.js tests', () => {
         const options = {
             accessToken: 'accessToken',
             org: 'org',
-            apiKey: 'apiKey'
+            apiKey: 'apiKey',
+            disable429Retry: true
         };
         nock('https://asset-compute.adobe.io')
             .post('/process')
