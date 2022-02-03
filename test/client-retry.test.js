@@ -96,9 +96,6 @@ describe('client-retry.js retry on 429 tests', () => {
     });
     it('should create asset compute client with default config retry on 429s', async function () {
         const { AssetComputeClientWithRetry } = require('../lib/client-retry');
-        nock('https://asset-compute.adobe.io')
-            .post('/register')
-            .reply(200, {});
 
         const assetComputeClient = new AssetComputeClientWithRetry(DEFAULT_INTEGRATION);
         await assetComputeClient.initialize();
@@ -109,9 +106,6 @@ describe('client-retry.js retry on 429 tests', () => {
         const options = {
             max429RetryCount: 10
         };
-        nock('https://asset-compute.adobe.io')
-            .post('/register')
-            .reply(200, {});
 
         const assetComputeClient = new AssetComputeClientWithRetry(DEFAULT_INTEGRATION, options);
         await assetComputeClient.initialize();
@@ -138,7 +132,8 @@ describe('client-retry.js retry on 429 tests', () => {
             await assetComputeClient.register();
             assert.fail('Should have failed');
         } catch (error) {
-            assert.strictEqual(error.message, 'Running into 429s after 2 attempts. Will not continue retrying. Try again in a few minutes.');
+            assert.ok(error.message.includes('Too many requests'));
+            assert.ok(error.message.includes('429'));
         }
         assert.ok(nock.isDone());
     }).timeout(5000);
@@ -191,7 +186,8 @@ describe('client-retry.js retry on 429 tests', () => {
             await assetComputeClient.unregister();
             assert.fail('Should have failed');
         } catch (error) {
-            assert.strictEqual(error.message, 'Running into 429s after 2 attempts. Will not continue retrying. Try again in a few minutes.');
+            assert.ok(error.message.includes('Too many requests'));
+            assert.ok(error.message.includes('429'));
         }
         assert.ok(nock.isDone());
     }).timeout(5000);
@@ -263,7 +259,8 @@ describe('client-retry.js retry on 429 tests', () => {
             ]);
             assert.fail('Should have failed');
         } catch (error) {
-            assert.strictEqual(error.message, 'Running into 429s after 2 attempts. Will not continue retrying. Try again in a few minutes.');
+            assert.ok(error.message.includes('Too many requests'));
+            assert.ok(error.message.includes('429'));
         }
         assert.ok(nock.isDone());
     }).timeout(5000);
