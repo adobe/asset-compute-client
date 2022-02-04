@@ -34,7 +34,7 @@ const DEFAULT_INTEGRATION = {
     imsEndpoint: 'https://mocked-ims-endpoint.com'
 };
 
-describe('client-retry.js retry on 429 tests', () => {
+describe('retry on 429 tests', () => {
     before(() => {
         mockRequire.stopAll();
         nock.cleanAll();
