@@ -35,7 +35,9 @@ const DEFAULT_INTEGRATION = {
 };
 
 describe('client.js tests', () => {
-    beforeEach(() => {
+    before(() => {
+        mockRequire.stopAll();
+        nock.cleanAll();
         mockRequire("@adobe/asset-compute-events-client", {
             AdobeAuth: class AdobeAuthMock {
                 constructor(config) {
@@ -69,8 +71,9 @@ describe('client.js tests', () => {
                 stop() { }
             }
         });
+        mockRequire.reRequire('../lib/client');
+        mockRequire.reRequire('../lib/retry');
     });
-
     afterEach(() => {
         mockRequire.stopAll();
         nock.cleanAll();
@@ -485,7 +488,6 @@ describe('client.js tests', () => {
 });
 
 describe('client.js event emitting', () => {
-
     function buildEvent(event, assetComputeClient, requestId) {
         const userData = {
             assetComputeClient: {

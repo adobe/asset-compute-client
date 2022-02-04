@@ -16,10 +16,12 @@ const { AssetCompute } = require("./lib/assetcompute");
 const { AssetComputeEventEmitter } = require("./lib/eventemitter");
 const { AssetComputeClient } = require("./lib/client");
 const { getIntegrationConfiguration } = require('./lib/integrationConfiguration');
+const { TooManyRequestsError } = require('./lib/error');
 
 module.exports = {
     AssetCompute,
     AssetComputeEventEmitter,
     AssetComputeClient,
-    getIntegrationConfiguration
+    getIntegrationConfiguration,
+    TooManyRequestsError
 };
