@@ -10,7 +10,6 @@
     "repository": "adobe/asset-compute-client",
     "dependencies": {
         "@adobe/asset-compute-events-client": "^1.0.1",
-        "@adobe/jwt-auth": "^0.3.3",
         "@adobe/node-fetch-retry": "^2.0.0",
         "clone": "^2.1.2",
         "fs-extra": "^10.0.0",
