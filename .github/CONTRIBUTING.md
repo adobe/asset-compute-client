@@ -30,6 +30,16 @@ All submissions should come in the form of pull requests and need to be reviewed
 by project committers. Read [GitHub's pull request documentation](https://help.github.com/articles/about-pull-requests/)
 for more information on sending pull requests.
 
+We use `semantic-release` to manage releases and by convention we currently do a major bump to semver. semantic-release lets you configure multiple commit conventions.
+Merge/squash PR using right commit title using one of the below tags-
+
+```
+- if -> commit message starts with "BREAKING-RELEASE:" then major release. Ex: X.0.0
+- if -> commit message starts with "FEATURE-RELEASE: " then minor release. Ex: X.Y.0
+- if -> commit message starts with "BUGFIX-RELEASE:" then patch release. Ex: X.Y.Z
+- else if -> anything else in commit message you WONT GET A release.
+```
+
 Lastly, please follow the [pull request template](PULL_REQUEST_TEMPLATE.md) when
 submitting a pull request!
 
