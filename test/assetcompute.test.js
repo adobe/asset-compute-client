@@ -48,6 +48,41 @@ describe( 'assetcompute.js tests', () => {
         assert.strictEqual(response.requestId, requestId);
         assert.strictEqual(response.journal, journal);
     });
+
+    it('should call asset compute /process successfully and pass along source headers', async function() {
+        const options = {
+            accessToken: 'accessToken',
+            org: 'org',
+            apiKey: 'apiKey'
+
+        };
+        const requestId = '1234567890';
+        const source = {
+            url: 'https://example.com/dog.jpg',
+            headers: {
+                'x-foo': 'bar'
+            }
+        };
+        const renditions = [{
+            name: 'rendition.jpg',
+            fmt: 'jpg'
+        }];
+        nock('https://asset-compute.adobe.io')
+            .post('/process', {
+                source,
+                renditions
+
+            })
+            .reply(200,{
+                'ok': true,
+                'requestId': requestId
+            });
+
+        const assetCompute = new AssetCompute(options);
+        const response = await assetCompute.process(source, renditions);
+        assert.strictEqual(response.requestId, requestId);
+    });
+
     it('should fail calling asset compute /register with 401', async function() {
         const options = {
             accessToken: 'accessToken',
