@@ -37,7 +37,8 @@
         "adobe"
     ],
     "scripts": {
-        "test": "nyc mocha --recursive --exit",
+        "test": "nyc mocha --recursive --exit ./test",
+        "e2e": "mocha --recursive --exit ./e2e",
         "posttest": "eslint . && license-checker --summary",
         "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
         "beautify": "eslint . --fix",
