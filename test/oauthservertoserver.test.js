@@ -15,29 +15,27 @@
 
 'use strict';
 
-const { expect } = require('chai');
+const assert = require('assert');
 const sinon = require('sinon');
-const fetch = require('@adobe/node-fetch-retry');
 const {
     isOAuthServerToServerIntegration,
     validateOAuthServerToServerIntegration,
-    createOAuthServerToServerAccessToken
-} = require('./oauthservertoserver');
+} = require('../lib/oauthservertoserver');
 
 describe('OAuth Server to Server Integration', () => {
     describe('isOAuthServerToServerIntegration', () => {
         it('should return true for valid OAuth Server to Server integration', () => {
             const integration = { TYPE: 'oauthservertoserver' };
-            expect(isOAuthServerToServerIntegration(integration)).to.be.true;
+            assert.strictEqual(isOAuthServerToServerIntegration(integration), true);
         });
 
         it('should return false for invalid integration', () => {
             const integration = { TYPE: 'other' };
-            expect(isOAuthServerToServerIntegration(integration)).to.be.false;
+            assert.strictEqual(isOAuthServerToServerIntegration(integration), false);
         });
 
         it('should return false for null integration', () => {
-            expect(isOAuthServerToServerIntegration(null)).to.be.false;
+            assert.strictEqual(isOAuthServerToServerIntegration(null), false);
         });
     });
 
@@ -51,7 +49,7 @@ describe('OAuth Server to Server Integration', () => {
                 TECHNICAL_ACCOUNT_ID: 'account_id',
                 TECHNICAL_ACCOUNT_EMAIL: 'email@example.com'
             };
-            expect(validateOAuthServerToServerIntegration(integration)).to.be.true;
+            assert.strictEqual(validateOAuthServerToServerIntegration(integration), true);
         });
 
         it('should return false for invalid integration', () => {
@@ -63,23 +61,30 @@ describe('OAuth Server to Server Integration', () => {
                 TECHNICAL_ACCOUNT_ID: 'account_id',
                 TECHNICAL_ACCOUNT_EMAIL: 'email@example.com'
             };
-            expect(validateOAuthServerToServerIntegration(integration)).to.be.false;
+            assert.strictEqual(validateOAuthServerToServerIntegration(integration), false);
         });
 
         it('should return false for null integration', () => {
-            expect(validateOAuthServerToServerIntegration(null)).to.be.false;
+            assert.strictEqual(validateOAuthServerToServerIntegration(null), false);
         });
     });
 
-    describe('createOAuthServerToServerAccessToken', () => {
+    const proxyquire = require('proxyquire');
+
+    describe('OAuth Server to Server Integration', () => {
         let fetchStub;
+        let createOAuthServerToServerAccessToken;
 
         beforeEach(() => {
-            fetchStub = sinon.stub(fetch, 'default');
+            fetchStub = sinon.stub();
+            const oauthModule = proxyquire('../lib/oauthservertoserver', {
+                '@adobe/node-fetch-retry': fetchStub
+            });
+            createOAuthServerToServerAccessToken = oauthModule.createOAuthServerToServerAccessToken;
         });
 
         afterEach(() => {
-            fetchStub.restore();
+            sinon.restore();
         });
 
         it('should return access token for valid client secret', async () => {
@@ -95,7 +100,7 @@ describe('OAuth Server to Server Integration', () => {
             });
 
             const token = await createOAuthServerToServerAccessToken(integration);
-            expect(token).to.equal('access_token');
+            assert.strictEqual(token, 'access_token');
         });
 
         it('should throw error for invalid client secret', async () => {
@@ -114,8 +119,9 @@ describe('OAuth Server to Server Integration', () => {
 
             try {
                 await createOAuthServerToServerAccessToken(integration);
+                assert.fail('Expected error was not thrown');
             } catch (error) {
-                expect(error.message).to.equal('Unable to create access token, all client_secret tokens failed');
+                assert.strictEqual(error.message, 'Unable to create access token, all client_secret tokens failed');
             }
         });
 
@@ -133,9 +139,82 @@ describe('OAuth Server to Server Integration', () => {
 
             try {
                 await createOAuthServerToServerAccessToken(integration);
+                assert.fail('Expected error was not thrown');
             } catch (error) {
-                expect(error.message).to.equal('Unexpected response from IMS');
+                assert.strictEqual(error.message, 'Unexpected response from IMS');
             }
         });
     });
+
+    // describe('createOAuthServerToServerAccessToken', () => {
+    //     let fetchStub;
+
+    //     beforeEach(() => {
+    //         fetchStub = sinon.stub(fetch, 'default');
+    //     });
+
+    //     afterEach(() => {
+    //         if (fetchStub) {
+    //             fetchStub.restore();
+    //         }
+    //     });
+
+    //     it('should return access token for valid client secret', async () => {
+    //         const integration = {
+    //             CLIENT_ID: 'client_id',
+    //             CLIENT_SECRETS: ['secret1'],
+    //             SCOPES: ['scope1']
+    //         };
+
+    //         fetchStub.resolves({
+    //             ok: true,
+    //             json: async () => ({ access_token: 'access_token' })
+    //         });
+
+    //         const token = await createOAuthServerToServerAccessToken(integration);
+    //         assert.strictEqual(token, 'access_token');
+    //     });
+
+    //     it('should throw error for invalid client secret', async () => {
+    //         const integration = {
+    //             CLIENT_ID: 'client_id',
+    //             CLIENT_SECRETS: ['invalid_secret'],
+    //             SCOPES: ['scope1']
+    //         };
+
+    //         fetchStub.resolves({
+    //             ok: false,
+    //             status: 400,
+    //             statusText: 'Bad Request',
+    //             json: async () => ({ error: 'invalid_client', error_description: 'invalid client_secret parameter' })
+    //         });
+
+    //         try {
+    //             await createOAuthServerToServerAccessToken(integration);
+    //             assert.fail('Expected error was not thrown');
+    //         } catch (error) {
+    //             assert.strictEqual(error.message, 'Unable to create access token, all client_secret tokens failed');
+    //         }
+    //     });
+
+    //     it('should throw error for unexpected response', async () => {
+    //         const integration = {
+    //             CLIENT_ID: 'client_id',
+    //             CLIENT_SECRETS: ['secret1'],
+    //             SCOPES: ['scope1']
+    //         };
+
+    //         fetchStub.resolves({
+    //             ok: true,
+    //             json: async () => ({})
+    //         });
+
+    //         try {
+    //             await createOAuthServerToServerAccessToken(integration);
+    //             assert.fail('Expected error was not thrown');
+    //         } catch (error) {
+    //             assert.strictEqual(error.message, 'Unexpected response from IMS');
+    //         }
+    //     });
+    // });
 });

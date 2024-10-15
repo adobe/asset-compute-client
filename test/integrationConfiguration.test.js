@@ -273,20 +273,21 @@ describe('integrationConfiguration.js tests', () => {
             
         });
 
-        it('Input file is JSON - ASSET_COMPUTE_INTEGRATION_FILE_PATH & ASSET_COMPUTE_PRIVATE_KEY_FILE_PATH', async () => {
+        it('Input file is JSON - ASSET_COMPUTE_INTEGRATION_FILE_PATH & ASSET_COMPUTE_PRIVATE_KEY_FILE_PATH are set', async () => {
             process.env.ASSET_COMPUTE_INTEGRATION_FILE_PATH = jsonFile;
             process.env.ASSET_COMPUTE_PRIVATE_KEY_FILE_PATH = privateKeyFile;
-            const actual = await IntegrationConfiguration.getIntegrationConfiguration();
+            const actual = await IntegrationConfiguration.getIntegrationConfiguration(jsonFileOAuthS2S);
 
-            assert.strictEqual(actual.metascopes[0], expectedJson.metascopes[0]);
-            assert.strictEqual(actual.metascopes[1], expectedJson.metascopes[1]);
-            assert.strictEqual(actual.metascopes[2], expectedJson.metascopes[2]);
+            assert.strictEqual(actual.SCOPES[0], expectedJson.SCOPES[0]);
+            assert.strictEqual(actual.SCOPES[1], expectedJson.SCOPES[1]);
+            assert.strictEqual(actual.SCOPES[2], expectedJson.SCOPES[2]);
 
-            assert.strictEqual(actual.technicalAccount.id, expectedJson.technicalAccount.id);
-            assert.strictEqual(actual.technicalAccount.org, expectedJson.technicalAccount.org);
-            assert.strictEqual(actual.technicalAccount.clientId, expectedJson.technicalAccount.clientId);
-            assert.strictEqual(actual.technicalAccount.clientSecret, expectedJson.technicalAccount.clientSecret);
-            assert.strictEqual(expectedJson.technicalAccount.privateKey.test(actual.technicalAccount.privateKey), true);
+            assert.strictEqual(actual.ORG_ID, expectedJson.ORG_ID);
+            assert.strictEqual(actual.CLIENT_SECRETS[0], expectedJson.CLIENT_SECRETS[0]);
+            assert.strictEqual(actual.CLIENT_ID, expectedJson.CLIENT_ID);
+            assert.strictEqual(actual.TECHNICAL_ACCOUNT_ID, expectedJson.TECHNICAL_ACCOUNT_ID);
+            assert.strictEqual(actual.TECHNICAL_ACCOUNT_EMAIL, expectedJson.TECHNICAL_ACCOUNT_EMAIL);
+            assert.strictEqual(actual.TYPE, "oauthservertoserver");
         });
 
         it('Input file is missing properties', async () => {
