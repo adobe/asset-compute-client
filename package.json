@@ -9,8 +9,8 @@
     },
     "repository": "adobe/asset-compute-client",
     "dependencies": {
-        "@adobe/asset-compute-events-client": "^1.2.0",
-        "@adobe/node-fetch-retry": "^2.2.0",
+        "@adobe/asset-compute-events-client": "^1.2.1",
+        "@adobe/node-fetch-retry": "^2.0.0",
         "clone": "^2.1.2",
         "fs-extra": "^11.1.1",
         "js-yaml": "^4.1.0",
