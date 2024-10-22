@@ -75,3 +75,6 @@ dist/
 
 # Important Documentation
 !.github/**
+
+# Mac OS hidden files
+.DS_Store

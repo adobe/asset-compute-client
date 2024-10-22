@@ -1,0 +1,23 @@
+{
+  "ORG_ID": "test-org@AdobeOrg",
+  "CLIENT_SECRETS": "not-an-array",
+  "CLIENT_ID": "test-client-id",
+  "SCOPES":
+  [
+      "openid",
+      "AdobeID",
+      "read_organizations",
+      "asset_compute",
+      "event_receiver",
+      "adobeio_api",
+      "session",
+      "additional_info",
+      "additional_info.projectedProductContext",
+      "additional_info.roles",
+      "read_client_secret",
+      "manage_client_secrets",
+      "event_receiver_api"
+  ],
+  "TECHNICAL_ACCOUNT_ID": "test-tech-account-id",
+  "TECHNICAL_ACCOUNT_EMAIL": "test-tech-account-email"
+}
