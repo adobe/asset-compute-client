@@ -20,6 +20,8 @@ require("dotenv").config();
 
 describe('e2e', () => {
     it('register', async function () {
+        // set process.env.ASSET_COMPUTE_INTEGRATION_FILE_PATH as path of the OAuth 
+        // integration. for instance 359WhiteTern-274796-OAuth Server-to-Server.json
         const integration = await getIntegrationConfiguration();
         const assetCompute = new AssetComputeClient(integration);
         await assetCompute.register();
