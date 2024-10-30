@@ -23,6 +23,7 @@ const IntegrationConfiguration = require(`../lib/integrationConfiguration`);
 const plainTextFile = path.join(process.cwd(), "test", "resources/plain-text-file.txt");
 const yamlFile = path.join(process.cwd(), "test", "resources/integration.yaml");
 const jsonFile = path.join(process.cwd(), "test", "resources/integration.json");
+const jsonFileOAuthS2S = path.join(process.cwd(), "test", "resources/oauthServerToServer.json");
 const privateKeyFile = path.join(process.cwd(), "test", "resources/privatekey.pem");
 
 describe('integrationConfiguration.js tests', () => {
@@ -224,6 +225,92 @@ describe('integrationConfiguration.js tests', () => {
 
             await assert.rejects(
                 () => IntegrationConfiguration.getIntegrationConfiguration(jsonFile),
+                expected
+            );
+        });
+    });
+
+    describe('OAuth S2S JSON Input', () => {
+
+        const expectedJson = {
+            SCOPES: [
+                "openid",
+                "AdobeID",
+                "read_organizations",
+                "asset_compute",
+                "event_receiver",
+                "adobeio_api",
+                "session",
+                "additional_info",
+                "additional_info.projectedProductContext",
+                "additional_info.roles",
+                "read_client_secret",
+                "manage_client_secrets",
+                "event_receiver_api"
+            ],
+            ORG_ID: "test-org@AdobeOrg",
+            CLIENT_SECRETS: [
+                "test-client-secret"
+            ],
+            CLIENT_ID: "test-client-id",
+            TECHNICAL_ACCOUNT_ID: "test-tech-account-id",
+            TECHNICAL_ACCOUNT_EMAIL: "test-tech-account-email"
+        };
+
+        it('Input file is JSON', async () => {
+            const actual = await IntegrationConfiguration.getIntegrationConfiguration(jsonFileOAuthS2S);
+
+            assert.strictEqual(actual.SCOPES[0], expectedJson.SCOPES[0]);
+            assert.strictEqual(actual.SCOPES[1], expectedJson.SCOPES[1]);
+            assert.strictEqual(actual.SCOPES[2], expectedJson.SCOPES[2]);
+
+            assert.strictEqual(actual.ORG_ID, expectedJson.ORG_ID);
+            assert.strictEqual(actual.CLIENT_SECRETS[0], expectedJson.CLIENT_SECRETS[0]);
+            assert.strictEqual(actual.CLIENT_ID, expectedJson.CLIENT_ID);
+            assert.strictEqual(actual.TECHNICAL_ACCOUNT_ID, expectedJson.TECHNICAL_ACCOUNT_ID);
+            assert.strictEqual(actual.TECHNICAL_ACCOUNT_EMAIL, expectedJson.TECHNICAL_ACCOUNT_EMAIL);
+            assert.strictEqual(actual.TYPE, "oauthservertoserver");
+            
+        });
+
+        it('Input file is JSON - ASSET_COMPUTE_INTEGRATION_FILE_PATH & ASSET_COMPUTE_PRIVATE_KEY_FILE_PATH are set', async () => {
+            process.env.ASSET_COMPUTE_INTEGRATION_FILE_PATH = jsonFile;
+            process.env.ASSET_COMPUTE_PRIVATE_KEY_FILE_PATH = privateKeyFile;
+            const actual = await IntegrationConfiguration.getIntegrationConfiguration(jsonFileOAuthS2S);
+
+            assert.strictEqual(actual.SCOPES[0], expectedJson.SCOPES[0]);
+            assert.strictEqual(actual.SCOPES[1], expectedJson.SCOPES[1]);
+            assert.strictEqual(actual.SCOPES[2], expectedJson.SCOPES[2]);
+
+            assert.strictEqual(actual.ORG_ID, expectedJson.ORG_ID);
+            assert.strictEqual(actual.CLIENT_SECRETS[0], expectedJson.CLIENT_SECRETS[0]);
+            assert.strictEqual(actual.CLIENT_ID, expectedJson.CLIENT_ID);
+            assert.strictEqual(actual.TECHNICAL_ACCOUNT_ID, expectedJson.TECHNICAL_ACCOUNT_ID);
+            assert.strictEqual(actual.TECHNICAL_ACCOUNT_EMAIL, expectedJson.TECHNICAL_ACCOUNT_EMAIL);
+            assert.strictEqual(actual.TYPE, "oauthservertoserver");
+        });
+
+        it('Input file is missing properties', async () => {
+            const s2sJsonFile = path.join(process.cwd(), "test", "resources/oauthServerToServer-missing-properties.json");
+            const expected = {
+                constructor: Error,
+                message: "Incomplete OAuth Server to Server configuration"
+            };
+
+            await assert.rejects(
+                () => IntegrationConfiguration.getIntegrationConfiguration(s2sJsonFile),
+                expected
+            );
+        });
+
+        it('Input file is not a JSON', async () => {
+            const expected = {
+                constructor: Error,
+                message: "Not all integration configuration properties are present"
+            };
+
+            await assert.rejects(
+                () => IntegrationConfiguration.getIntegrationConfiguration(plainTextFile),
                 expected
             );
         });
