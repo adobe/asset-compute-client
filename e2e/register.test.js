@@ -19,12 +19,44 @@ const { AssetComputeClient, getIntegrationConfiguration } = require("../index.js
 require("dotenv").config();
 
 describe('e2e', () => {
-    it('register', async function () {
+    let assetCompute;
+
+    before(async function() {
         // set process.env.ASSET_COMPUTE_INTEGRATION_FILE_PATH as path of the OAuth 
         // integration. for instance 359WhiteTern-274796-OAuth Server-to-Server.json
         const integration = await getIntegrationConfiguration();
-        const assetCompute = new AssetComputeClient(integration);
-        await assetCompute.register();
+        assetCompute = new AssetComputeClient(integration);
+    });
+    it('register', async function () {
+        const registerResp = await assetCompute.register();
+        console.log('registerResp >>', registerResp);
         await assetCompute.close();
     }).timeout(60000);
+
+    it('process', async function () {
+        const sleep = ms => new Promise(res => setTimeout(res, ms));
+        
+        // add wait time for events provider to set up
+        await sleep(45000); // 30s
+
+        const { requestId } = await assetCompute.process(
+            {url: 'data:text/html;base64,PHA+VGhpcyBpcyBteSBjb250ZW50IGZyYWdtZW50LiBXaGF0J3MgZ29pbmcgb24/PC9wPgo='}, [
+                {
+                    name: "rendition.png",
+                    url: "https://presigned-target-url",
+                    fmt: "png",
+                    width: 200,
+                    height: 200
+                }
+            ]
+        );
+        console.log('requestId >>', requestId);
+        const events = await assetCompute.waitActivation(requestId);
+        if (events[0].type === "rendition_created") {
+            console.log("rendition created");
+        } else {
+            console.log("rendition failure");
+        }
+        await assetCompute.close();
+    }).timeout(120000);
 });
